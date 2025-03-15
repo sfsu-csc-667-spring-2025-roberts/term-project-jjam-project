@@ -1,3 +1,4 @@
+import * as path from "path";
 import express from 'express';
 import rootRoutes from "./routes/root";
 import httpErrors from "http-errors";
@@ -15,15 +16,6 @@ const PORT = process.env.PORT || 3000;
     //still must restart server IF new dependency is imported, add NODE_ENV=production to beginning to get non-dev version of errors
 
 
-
-// const fn = (request, response) => {
-
-// }
-
-// const fn2 = (request, response) => {
-    
-// }
-
 //any time a get request is made to the root of our site, this will be executed
 // app.get("/", (request, response) => {
 //     response.send("Hello World!");
@@ -33,6 +25,18 @@ const PORT = process.env.PORT || 3000;
 //middleware functions, tells express to execute "next" thing in function chain after this one----------------------------------------------------
 
 app.use(timeMiddleware);
+
+//express can also serve static files, unchanging ungenerated files
+
+//app.use(express.static(process.cwd() + "/public")); //the /public would mean this would only work on a nix system, we need to make it generic to run on windows
+//if the request matches a file in "public", the file will be served rather than executing code
+    //example: image file called favicon.ico will be used in browser as tab icon
+app.use(express.static(path.join(process.cwd(), "public")));
+
+//html template using ejs, makes responses that respond with html easier to make
+app.set("views", path.join(process.cwd(), "src", "server", "templates"));
+app.set("view engine", "ejs");
+
 
 //use called with mount point, meaning any routes from rootRoutes are relative to the base url (represented by "/")
 app.use("/", rootRoutes);
