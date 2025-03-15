@@ -2,6 +2,8 @@ import * as path from "path";
 import express from 'express';
 import rootRoutes from "./routes/root";
 import httpErrors from "http-errors";
+import morgan from "morgan";//function that returns middleware
+import cookieParser from "cookie-parser";
 import {timeMiddleware} from "./middleware/time";
 
 //index.tx: setting up application, define application in other parts
@@ -16,6 +18,13 @@ const PORT = process.env.PORT || 3000;
     //still must restart server IF new dependency is imported, add NODE_ENV=production to beginning to get non-dev version of errors
 
 
+//husky: library that allows us to define "kit hooks"
+    //there are life cycle events that happen when working with the git repository
+    //hook is code that executes in response to one of those events
+    //for instance, if we wanted to make code that executes when we commit to the git repository
+
+//npx lint-staged: run lint-staged script in the context of the node modules package
+
 //any time a get request is made to the root of our site, this will be executed
 // app.get("/", (request, response) => {
 //     response.send("Hello World!");
@@ -24,7 +33,20 @@ const PORT = process.env.PORT || 3000;
 
 //middleware functions, tells express to execute "next" thing in function chain after this one----------------------------------------------------
 
+//function that returns middleware
+app.use(morgan("dev"));
+
+//any time the express server recieves a request with content type application json, automatically takes body of request and turns it into an object in the request parameter
+app.use(express.json());
+
+//allows to take special characters in urls
+app.use(express.urlencoded({extended: false}));
+
+app.use(cookieParser());
+
 app.use(timeMiddleware);
+
+
 
 //express can also serve static files, unchanging ungenerated files
 
