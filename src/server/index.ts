@@ -5,6 +5,7 @@ import httpErrors from "http-errors";
 import morgan from "morgan"; //function that returns middleware
 import cookieParser from "cookie-parser";
 import { timeMiddleware } from "./middleware/time";
+import testRouter from "./routes/test";
 
 
 import dotenv from "dotenv";
@@ -68,7 +69,8 @@ app.set("view engine", "ejs");
 
 //use called with mount point, meaning any routes from rootRoutes are relative to the base url (represented by "/")
 app.use("/", rootRoutes);
-app.use("/test", () => {});
+app.use("/test", testRouter);
+//app.use("/test", () => {});
 
 //displays 404 error for urls that don't exist on site
 //put towards bottom because style is executed from top to bottom, we want this to execute once all other routes have been defined
@@ -77,7 +79,7 @@ app.use((_request, _response, next) => {
   next(httpErrors(404));
 });
 
-//video 37:13
+//video 7 37:13
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`); //use backticks instead of ' or " (same key as ~, above tab)
 });
@@ -96,10 +98,10 @@ app.listen(PORT, () => {
 //"db:migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js up -j ts", //apply changes to database
 //"db:rollback": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js down -j ts", //reverts changes to database
 
-//1:19:35
+//video 8 1:19:35
 //npm run db:create test migration //DO NOT CHANGE TITLE OF MIGRATION FILE, is timestamp that is needed to run migrations in correct order
 
-//1:24:50
+//video 8 1:24:50
 //npm run db:migrate //executes migration from migration file, translates code to sql
 
 //to see test table:
@@ -110,3 +112,6 @@ app.listen(PORT, () => {
 
 //to undo creation of test_table
 //npm run db:rollback
+
+
+//2:00:51
