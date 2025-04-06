@@ -6,6 +6,10 @@ import morgan from "morgan"; //function that returns middleware
 import cookieParser from "cookie-parser";
 import { timeMiddleware } from "./middleware/time";
 
+
+import dotenv from "dotenv";
+dotenv.config();//reads values in .env file
+
 //index.tx: setting up application, define application in other parts
 
 const app = express();
@@ -44,6 +48,13 @@ app.use(cookieParser());
 
 app.use(timeMiddleware);
 
+// app.use(
+//   express.urlencoded{{
+//     extended: false,
+//   }
+// });
+
+
 //express can also serve static files, unchanging ungenerated files
 
 //app.use(express.static(process.cwd() + "/public")); //the /public would mean this would only work on a nix system, we need to make it generic to run on windows
@@ -70,3 +81,32 @@ app.use((_request, _response, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`); //use backticks instead of ' or " (same key as ~, above tab)
 });
+
+
+//postgres stuff:
+//to create postgres database: createdb -U postgres spring-2025 (password=1234)
+//to see database: psql -U postgres spring-2025
+
+//each person will have their own copy of the database, so people can tinker without messing each other up
+
+//npm install node-pg-migrate
+//migrations: library that helps us incrementally change the structure of our database that we can record in our code
+
+//"db:create": "node-pg-migrate create -j ts --", //create file
+//"db:migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js up -j ts", //apply changes to database
+//"db:rollback": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js down -j ts", //reverts changes to database
+
+//1:19:35
+//npm run db:create test migration //DO NOT CHANGE TITLE OF MIGRATION FILE, is timestamp that is needed to run migrations in correct order
+
+//1:24:50
+//npm run db:migrate //executes migration from migration file, translates code to sql
+
+//to see test table:
+  //psql -U postgres spring-2025
+  //\dt //the pgmigrations table isn't our creation, it's how the migrations are kept track of
+  //select * from test_table; 
+  //\d test_table
+
+//to undo creation of test_table
+//npm run db:rollback
