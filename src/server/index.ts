@@ -9,7 +9,7 @@ import { timeMiddleware } from "./middleware/time";
 //ALWAYS import dotenv BEFORE importing connection object
 import dotenv from "dotenv";
 dotenv.config();//reads values in .env file
-import testRouter from "./routes/test";
+import testRouter from "./routes/test";//connection object
 
 //index.tx: setting up application, define application in other parts
 
