@@ -27,10 +27,38 @@ router.get("/", async (_request: Request, response: Response) => {
         response.json(await db.any("SELECT * FROM test_table"));//fetch all records from test table and returning them to the client as json
     }catch (error){
         console.error(error);
+        response.status(500).json({error: "internal Server Error"});
     }
 });
 
 //both new Promise and router.get functions here are functionally equivalent, just interact with promise with different syntax
 //REMEMBER: when working with asynchronous code, we are not returned data but instead a promise object we must work with
+
+
+//implementation of db.none
+// const none = (sql: string, values: any[]) => {
+//     return new Promise((resolve, reject) => {
+//         //Do actiona database operations here
+//         const (result, error) = { "whatever the database logic is", error:null };
+//          if(error !== null){
+//              reject(error);
+//          }
+//         resolve(result);
+//     });
+// }
+
+router.get("/promise_version", (request: Request, response: Response) => {
+    db.none(
+        "INSERT INTO test_table (test_string) VALUES ($1)", [
+            `test string $(new Date().toISOString()}`
+        ]).then(() => {
+            return db.any("SELECT * FROM test_table");
+        }).then((result) => {
+            response.json(result);
+        }).catch((error) => {
+            console.error(error);
+            response.status(500).json({error: "internal Server Error"});
+        });
+});
 
 export default router;

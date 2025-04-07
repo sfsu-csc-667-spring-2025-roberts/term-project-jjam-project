@@ -5,11 +5,11 @@ import httpErrors from "http-errors";
 import morgan from "morgan"; //function that returns middleware
 import cookieParser from "cookie-parser";
 import { timeMiddleware } from "./middleware/time";
-import testRouter from "./routes/test";
 
-
+//ALWAYS import dotenv BEFORE importing connection object
 import dotenv from "dotenv";
 dotenv.config();//reads values in .env file
+import testRouter from "./routes/test";
 
 //index.tx: setting up application, define application in other parts
 
@@ -69,8 +69,9 @@ app.set("view engine", "ejs");
 
 //use called with mount point, meaning any routes from rootRoutes are relative to the base url (represented by "/")
 app.use("/", rootRoutes);
-app.use("/test", testRouter);
 //app.use("/test", () => {});
+app.use("/test", testRouter);
+
 
 //displays 404 error for urls that don't exist on site
 //put towards bottom because style is executed from top to bottom, we want this to execute once all other routes have been defined
