@@ -12,6 +12,7 @@ dotenv.config();//reads values in .env file
 
 import * as config from "./config";
 import * as routes from "./routes"; //takes the job of import testRouter and import rootRoutes
+import * as middleware from "./middleware";
 
 
 //import testRouter from "./routes/test";//connection object
@@ -22,7 +23,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 config.liveReload(app);
-
+config.session(app);
 //TO RUN: npx ts-node src/server/index.ts
 //replaced with script in package.json, automatically knows to call npx
 //replaced with nodemon --exec ts-node src/server/index.ts so we don't have to kill and restart the server every time we make an update to the site
@@ -55,6 +56,7 @@ app.use(cookieParser());
 
 app.use(timeMiddleware);
 
+
 // app.use(
 //   express.urlencoded{{
 //     extended: false,
@@ -78,7 +80,7 @@ app.use("/", routes.root);
 //app.use("/test", () => {});
 app.use("/test", routes.test);
 app.use("/auth", routes.auth);
-
+app.use("/lobby", middleware.authMiddleware, routes.lobby);//executes authentication middleware before doing anything else to verify user
 
 //displays 404 error for urls that don't exist on site
 //put towards bottom because style is executed from top to bottom, we want this to execute once all other routes have been defined
