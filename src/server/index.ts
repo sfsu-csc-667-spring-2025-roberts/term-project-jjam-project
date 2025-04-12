@@ -1,6 +1,6 @@
 import * as path from "path";
 import express from "express";
-import rootRoutes from "./routes/root";
+//import rootRoutes from "./routes/root";
 import httpErrors from "http-errors";
 import morgan from "morgan"; //function that returns middleware
 import cookieParser from "cookie-parser";
@@ -9,13 +9,19 @@ import { timeMiddleware } from "./middleware/time";
 //ALWAYS import dotenv BEFORE importing connection object
 import dotenv from "dotenv";
 dotenv.config();//reads values in .env file
-import testRouter from "./routes/test";//connection object
+
+import * as config from "./config";
+import * as routes from "./routes"; //takes the job of import testRouter and import rootRoutes
+
+
+//import testRouter from "./routes/test";//connection object
 
 //index.tx: setting up application, define application in other parts
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
+
+config.liveReload(app);
 
 //TO RUN: npx ts-node src/server/index.ts
 //replaced with script in package.json, automatically knows to call npx
@@ -68,9 +74,9 @@ app.set("views", path.join(process.cwd(), "src", "server", "templates"));
 app.set("view engine", "ejs");
 
 //use called with mount point, meaning any routes from rootRoutes are relative to the base url (represented by "/")
-app.use("/", rootRoutes);
+app.use("/", routes.root);
 //app.use("/test", () => {});
-app.use("/test", testRouter);
+app.use("/test", routes.test);
 
 
 //displays 404 error for urls that don't exist on site
