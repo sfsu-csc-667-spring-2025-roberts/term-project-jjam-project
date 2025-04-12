@@ -77,6 +77,7 @@ app.set("view engine", "ejs");
 app.use("/", routes.root);
 //app.use("/test", () => {});
 app.use("/test", routes.test);
+app.use("/auth", routes.auth);
 
 
 //displays 404 error for urls that don't exist on site
@@ -122,3 +123,7 @@ app.listen(PORT, () => {
 
 
 //2:00:51
+
+
+//1:06:21 class 9
+//drop db: dropdb -U postgres spring-2025
