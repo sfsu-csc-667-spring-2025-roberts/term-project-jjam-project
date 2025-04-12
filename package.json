@@ -4,16 +4,27 @@
   "description": "[![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=18572614)",
   "main": "index.js",
   "scripts": {
-    "start:dev": "nodemon --exec ts-node src/server/index.ts",
+    "start:dev": "concurrently --names backend,frontend -c blue,green \"npm run backend:dev\" \"npm run frontend:dev\"",
     "prepare": "husky",
     "db:create": "node-pg-migrate create -j ts --",
     "db:migrate": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js up -j ts",
     "db:rollback": "ts-node node_modules/node-pg-migrate/bin/node-pg-migrate.js down -j ts",
-    "prettier": "prettier --write ./src"
+    "prettier": "prettier --write ./src",
+    "frontend:dev": "parcel watch --dist-dir ./public/js",
+    "frontend": "parcel build",
+    "backend:dev": "nodemon --exec ts-node src/server/index.ts"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-jjam-project.git"
+  },
+  "targets": {
+    "chat": {
+      "source": "./src/client/chat/index.ts"
+    },
+    "games": {
+      "source": "./src/client/games/index.ts"
+    }
   },
   "keywords": [],
   "author": "",
@@ -30,9 +41,11 @@
     "@types/express": "^5.0.0",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.13.10",
+    "concurrently": "^9.1.2",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "nodemon": "^3.1.9",
+    "parcel": "^2.14.4",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
     "typecript": "^0.0.1-security"
