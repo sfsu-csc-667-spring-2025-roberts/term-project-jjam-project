@@ -51,7 +51,7 @@ router.get("/logout", async (request: Request, response: Response) => {
         //console.log("Session destroyed");
         //intentional no-op for now
     })
-    response.redirect("/");
+    response.redirect("/auth/login");
 })
 
 export default router;
