@@ -1,4 +1,8 @@
 import * as path from "path";
+
+import * as http from "http";
+
+
 import express from "express";
 //import rootRoutes from "./routes/root";
 import httpErrors from "http-errors";
@@ -13,6 +17,7 @@ dotenv.config();//reads values in .env file
 import * as config from "./config";
 import * as routes from "./routes"; //takes the job of import testRouter and import rootRoutes
 import * as middleware from "./middleware";
+import { Server } from "socket.io";
 
 
 //import testRouter from "./routes/test";//connection object
@@ -20,10 +25,18 @@ import * as middleware from "./middleware";
 //index.tx: setting up application, define application in other parts
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);//sets up io server along side our express application
+
 const PORT = process.env.PORT || 3000;
 
 config.liveReload(app);
-config.session(app);
+//config.session(app);
+
+const sessionMiddleware =  config.session(app);
+config.Socket(io, app, sessionMiddleware);
+
+
 //TO RUN: npx ts-node src/server/index.ts
 //replaced with script in package.json, automatically knows to call npx
 //replaced with nodemon --exec ts-node src/server/index.ts so we don't have to kill and restart the server every time we make an update to the site
@@ -90,7 +103,7 @@ app.use((_request, _response, next) => {
 });
 
 //video 7 37:13
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`); //use backticks instead of ' or " (same key as ~, above tab)
 });
 
