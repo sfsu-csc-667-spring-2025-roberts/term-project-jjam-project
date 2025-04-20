@@ -65,8 +65,15 @@ router.get("/promise_version", (request: Request, response: Response) => {
 //we are NEVER using sockets for state management because the server is the only truth we need
 router.post("/socket-test", (request: Request, response: Response) =>{
     const io = request.app.get("io");
+    //@ts-ignore
+    const { id } = request.session.user;
     if(io){
+        console.log("io not null");
         io.emit("test-event", {message: "Hello from the server!", timestamp: new Date()});
+        io.to(id).emit("test-event", {
+            message: `Secret message for user ${id}`,
+            timestamp: new Date(),
+        });
         response.status(200).send();
     }else{
         response.status(500).send();

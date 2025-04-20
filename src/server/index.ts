@@ -83,6 +83,7 @@ app.use(timeMiddleware);
 //if the request matches a file in "public", the file will be served rather than executing code
 //example: image file called favicon.ico will be used in browser as tab icon
 app.use(express.static(path.join(process.cwd(), "public")));
+app.use(middleware.roomMiddleware);
 
 //html template using ejs, makes responses that respond with html easier to make
 app.set("views", path.join(process.cwd(), "src", "server", "templates"));
@@ -94,6 +95,7 @@ app.use("/", routes.root);
 app.use("/test", routes.test);
 app.use("/auth", routes.auth);
 app.use("/lobby", middleware.authMiddleware, routes.lobby);//executes authentication middleware before doing anything else to verify user
+app.use("/chat", middleware.authMiddleware, routes.chat);
 
 //displays 404 error for urls that don't exist on site
 //put towards bottom because style is executed from top to bottom, we want this to execute once all other routes have been defined

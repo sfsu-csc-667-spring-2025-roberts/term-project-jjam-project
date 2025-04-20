@@ -14,12 +14,47 @@
                     class="gravatar"
                 />
                 Welcome <%= user.email %> (<%= user.id %>) </h1> 
+                <div id="content">
+                    <section id="game-listing">
+                        This is the game listening section TODO
+                    </section>
+
+                    <section id="chat-container">
+                        <div id="messages"></div>
+                        <form>
+                            <input type="text" name="message" id="message"/>
+                            <button type="submit" id="send-button">Send</button>
+                        </form>
+                    </section>
+                </div>
+
+
+
+            <% /* %>
             <ul>
-                <% /* %>
                 <li>id: <%= user.id %></li>
                 <li>gravatar: <%= user.gravatar %></li>
-                <% */ %>
+                
             </ul>
+            <% */ %>
+            <% /* %>
+            <a href=""#" id="test-socket-link">Test Socket</a>
+            <script>
+                document.querySelector("#test-socket-link").addEventListener("click", e => {
+                    e.preventDefault();
+                    console.log("Socket test link clicked");
+                    fetch("/test/socket-test", {
+                    method: "post",
+                    credentials: "include",
+                    }).then(() => {
+                        console.log("Socket test request sent");
+                    }).catch((error) => {
+                        console.error("Error sending socket test request:", error);
+                    });
+                })
+            </script>
+            <% */ %>
         </div>
+        <%- include("shared/templates") %>
     </body>
 </html>

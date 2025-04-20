@@ -15,11 +15,11 @@ const configureSockets = (io: Server, app: Express, sessionMiddleware: RequestHa
         //@ts-ignore
         const { id, user } = socket.request.session;
 
-        console.log(`User [$(user.id)] connected with session id: ${id}`);
+        console.log(`User [${user.id}] connected with session id: ${id}`);
         socket.join(user.id);//have socket join a room
 
         socket.on("disconnect", () => {
-            console.log(`User [$(user.id)] disconnected`);
+            console.log(`User [${user.id}] disconnected`);
             socket.leave(user.id);
         })
     })
