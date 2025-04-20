@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import db from "../db/connection";
 
 const router = express.Router();
+//dumping ground for new code to get things and test if it works
 
 // new Promise((resolve, reject) => {
 //     return db.any("SELECT * FROM test_table");
@@ -59,6 +60,17 @@ router.get("/promise_version", (request: Request, response: Response) => {
             console.error(error);
             response.status(500).json({error: "internal Server Error"});
         });
+});
+
+//we are NEVER using sockets for state management because the server is the only truth we need
+router.post("/socket-test", (request: Request, response: Response) =>{
+    const io = request.app.get("io");
+    if(io){
+        io.emit("test-event", {message: "Hello from the server!", timestamp: new Date()});
+        response.status(200).send();
+    }else{
+        response.status(500).send();
+    }
 });
 
 export default router;

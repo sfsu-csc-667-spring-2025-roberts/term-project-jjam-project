@@ -1,0 +1,38 @@
+/*good for debugging
+*{
+    border: 1px solid red;
+}
+*/
+
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+menu{
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+menu ul {
+    list-style: none;
+    display: flex;
+}
+
+menu ul li {
+    margin: 0 10px 0 0;
+}
+
+menu ul li:last-of-type {
+    margin-right: 0;
+}
+
+#container {
+    width: 1024px;
+    margin: 0 auto;
+}
+
+h1 img {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+}

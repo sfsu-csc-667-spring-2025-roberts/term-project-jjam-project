@@ -59,25 +59,27 @@
     </style>
 </head>
 <body>
-    <form action="/auth/register" method="post">
-        <h1>Register</h1>
-        <% if (locals.error && error) { %>
-            <p style="color: red"><%= error %></p>
-        <% } %>
-        <div>
-            <label for="username">Email</label>
-            <input type="email" name="email" id="username" required placeholder="Email address"
-                <% if(locals.email && email){ %>
-                    value = "<%= email %>"
-                <% } %>
-            />
-        </div>
-        <div>
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" required/>
-        </div>
-        <button type="submit">Register</button>
-        <a href="/auth/login">Already have an account? Login</a>
-    </form>
+    <div id="container">
+        <form action="/auth/register" method="post">
+            <h1>Register</h1>
+            <% if (locals.error && error) { %>
+                <p style="color: red"><%= error %></p>
+            <% } %>
+            <div>
+                <label for="username">Email</label>
+                <input type="email" name="email" id="username" required placeholder="Email address"
+                    <% if(locals.email && email){ %>
+                        value = "<%= email %>"
+                    <% } %>
+                />
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" required/>
+            </div>
+            <button type="submit">Register</button>
+            <a href="/auth/login">Already have an account? Login</a>
+        </form>
+    </div>
 </body>
 </html>

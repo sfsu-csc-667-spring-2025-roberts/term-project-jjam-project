@@ -2,13 +2,24 @@
     <head>
         <meta charset="UTF-8">
         <title>Crazy Eights | Lobby</title>
+        <%- include('shared/head') %>
     </head>
     <body>
-        <%- include('shared/menu') %>
-        <h1>Welcome <%= user.email %></h1>
-        <ul>
-            <li>id: <%= user.id %></li>
-            <li>gravatar: <%= user.gravatar %></li>
-        </ul>
+        <div id="container">
+            <%- include('shared/menu') %>
+            <h1>
+                <img 
+                    src="https://gravatar.com/avatar/ <%= user.gravatar%>?s=30&d=identicon" 
+                    alt="Gravatar"
+                    class="gravatar"
+                />
+                Welcome <%= user.email %> (<%= user.id %>) </h1> 
+            <ul>
+                <% /* %>
+                <li>id: <%= user.id %></li>
+                <li>gravatar: <%= user.gravatar %></li>
+                <% */ %>
+            </ul>
+        </div>
     </body>
 </html>

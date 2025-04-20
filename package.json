@@ -13,7 +13,7 @@
     "prettier": "prettier --write ./src",
     "frontend:dev": "parcel watch --dist-dir ./public/js",
     "frontend": "parcel build",
-    "backend:dev": "nodemon --exec ts-node src/server/index.ts --ext ts,ejs"
+    "backend:dev": "nodemon --exec ts-node src/server/index.ts --ext ts,ejs.css"
   },
   "repository": {
     "type": "git",
