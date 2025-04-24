@@ -1,0 +1,62 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Crazy Eights | Lobby</title>
+        <%- include('shared/head') %>
+    </head>
+    <body>
+        <div id="container">
+            <%- include('shared/menu') %>
+            <h1>
+                <img 
+                    src="https://gravatar.com/avatar/ <%= user.gravatar%>?s=30&d=identicon" 
+                    alt="Gravatar"
+                    class="gravatar"
+                />
+                Welcome <%= user.email %> (<%= user.id %>) </h1> 
+                <div id="content">
+                    <div id="feedback-message"></div>
+                    <button id="create-lobby-btn">Create Lobby</button>
+                    <input type="text" id="lobby-search-input" placeholder="Search lobbies..." style="margin:10px 0;display:block;"/>
+                    <section id="game-listing">
+                    </section>
+
+                    <section id="chat-container">
+                        <div id="messages"></div>
+                        <form>
+                            <input type="text" name="message" id="message"/>
+                            <button type="submit" id="send-button">Send</button>
+                        </form>
+                    </section>
+                </div>
+
+
+
+            <% /* %>
+            <ul>
+                <li>id: <%= user.id %></li>
+                <li>gravatar: <%= user.gravatar %></li>
+                
+            </ul>
+            <% */ %>
+            <% /* %>
+            <a href=""#" id="test-socket-link">Test Socket</a>
+            <script>
+                document.querySelector("#test-socket-link").addEventListener("click", e => {
+                    e.preventDefault();
+                    console.log("Socket test link clicked");
+                    fetch("/test/socket-test", {
+                    method: "post",
+                    credentials: "include",
+                    }).then(() => {
+                        console.log("Socket test request sent");
+                    }).catch((error) => {
+                        console.error("Error sending socket test request:", error);
+                    });
+                })
+            </script>
+            <% */ %>
+        </div>
+        <%- include("shared/templates") %>
+    </body>
+</html>
