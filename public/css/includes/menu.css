@@ -1,0 +1,17 @@
+menu{
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+menu ul {
+    list-style: none;
+    display: flex;
+}
+
+menu ul li {
+    margin: 0 10px 0 0;
+}
+
+menu ul li:last-of-type {
+    margin-right: 0;
+}

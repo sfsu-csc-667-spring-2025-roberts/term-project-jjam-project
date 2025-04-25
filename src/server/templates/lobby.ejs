@@ -7,6 +7,7 @@
     <body>
         <div id="container">
             <%- include('shared/menu') %>
+            <script src="\js\lobby\index.js" defer></script>
             <h1>
                 <img 
                     src="https://gravatar.com/avatar/ <%= user.gravatar%>?s=30&d=identicon" 
@@ -15,8 +16,9 @@
                 />
                 Welcome <%= user.email %> (<%= user.id %>) </h1> 
                 <div id="content">
+                    
                     <section id="game-listing">
-                        This is the game listening section TODO
+                        <button id="create-game-button">Create Game</button>
                     </section>
 
                     <section id="chat-container">
@@ -27,9 +29,6 @@
                         </form>
                     </section>
                 </div>
-
-
-
             <% /* %>
             <ul>
                 <li>id: <%= user.id %></li>
@@ -55,6 +54,7 @@
             </script>
             <% */ %>
         </div>
+        <%- include("games/create-form") %>
         <%- include("shared/templates") %>
     </body>
 </html>

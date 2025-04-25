@@ -1,0 +1,35 @@
+/* Chat Styles */
+#chat-container div#messages {
+    overflow-y: auto; 
+    height: 400px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+#chat-container div.message{
+    padding: 5px;
+    font-size: 14px;
+    display: flex;
+}
+
+#chat-container div.message img.avatar{
+    height: 30px;
+    width: 30px;
+    border-radius: 8px;
+    
+}
+
+#chat-container div div.message .message-wrapper{
+    margin-left: 5px;
+    display:flex;
+    flex-direction: column;
+    color: #333;
+    border: none;
+}
+
+#chat-container div div.message .message-wrapper .message-timestamp{
+    padding-top: 3px;
+    font-size:10px;
+    color: #999;
+}
