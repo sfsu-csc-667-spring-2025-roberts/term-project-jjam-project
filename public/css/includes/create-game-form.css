@@ -14,7 +14,17 @@
     margin: auto;
     border: 1px solid var(--color-border-light);
     border-radius: 5px;
-    padding: 10px;
+    padding: 15px;
     background-color: white;
-    box-shadow: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+#create-game-container form div {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#create-game-container form div input {
 }
