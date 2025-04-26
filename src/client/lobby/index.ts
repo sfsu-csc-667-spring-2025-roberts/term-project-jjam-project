@@ -1,8 +1,18 @@
 const createGameButton = document.querySelector("#create-game-button");
-const createGameForm = document.querySelector("#create-game-container");
-
+const createGameContainer = document.querySelector("#create-game-container");
+const closeButton = document.querySelector("#close-create-game-form");
 
 createGameButton?.addEventListener("click", (event) => {
     event.preventDefault();
-    createGameForm?.classList.add("visible");
-});  
+    createGameContainer?.classList.add("visible");
+});
+
+closeButton?.addEventListener("click", (event) =>{
+    event.preventDefault();
+    createGameContainer?.classList.remove("visible");
+
+});
+
+createGameContainer?.addEventListener("click", event => {
+    createGameContainer?.classList.remove("visible");
+});

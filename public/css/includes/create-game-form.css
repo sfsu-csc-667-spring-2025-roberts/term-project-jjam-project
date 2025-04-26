@@ -1,3 +1,14 @@
+#create-game-button{
+    position: absolute;
+    top: 0;
+    right: 10px;
+
+    border: 1px solid var(--color-border);
+    font-size: var(--font-size);
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
 #create-game-container {
     position: absolute;
     top: 0;
@@ -5,8 +16,12 @@
     width: 100%;
     height: 100%;
     vertical-align: middle;
-    display: flex;
     background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+#create-game-container.visible {
+    display: flex;
 }
 
 #create-game-container form {
@@ -14,17 +29,38 @@
     margin: auto;
     border: 1px solid var(--color-border-light);
     border-radius: 5px;
-    padding: 15px;
+    padding: 40px 15px 15px;
     background-color: white;
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+#create-game-container a#close-create-game-form {
+    text-decoration: none;
+    color: var(--color-border);
+    position: absolute;
+    right: 15px;
+    top: 15px;
 }
 
 #create-game-container form div {
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
-#create-game-container form div input {
+#create-game-container form div label {
+    display:inline-block;
+    width: 25%;
+}
+
+#create-game-container form div input, #create-game-container form button {
+    flex-grow: 1;
+    padding: 5px;
+    border: 1px solid var(--color-border);
+    font-size: var(--font-size);
+    border-radius: 5px;
+    margin-right: 10px;
 }
