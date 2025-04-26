@@ -96,6 +96,7 @@ app.use("/test", routes.test);
 app.use("/auth", routes.auth);
 app.use("/lobby", middleware.authMiddleware, routes.lobby);//executes authentication middleware before doing anything else to verify user
 app.use("/chat", middleware.authMiddleware, routes.chat);
+app.use("/games", middleware.authMiddleware, routes.games);
 
 //displays 404 error for urls that don't exist on site
 //put towards bottom because style is executed from top to bottom, we want this to execute once all other routes have been defined
