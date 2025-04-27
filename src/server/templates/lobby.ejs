@@ -23,9 +23,20 @@
                         <ul id="available-games">
                             <li>
                                 <span class="status waiting">status</span>
-                                <span class="game-name">Game Name</span>
+                                <span class="game-name">Game 1</span>
                                 <span class="game-players">Players</span>
-                                <a href="/games/42" class="button" target="_blank">Join</a>
+                                <form method="post" action="/games/join/1">
+                                    <button type="submit">Join</button>
+                                </form>
+                            </li>
+                            <li>
+                                <span class="status waiting">status</span>
+                                <span class="game-name">Game 2</span>
+                                <span class="game-players">Players</span>
+                                <form method="post" action="/games/join/2">
+                                        <input type="text" name="password">
+                                    <button type="submit">Join</button>
+                                </form>
                             </li>
                         </ul>
                     </section>
