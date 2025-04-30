@@ -28,6 +28,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);//sets up io server along side our express application
 
+// Serve public/game.js
+app.use('/game.js', express.static(path.join(__dirname, '../../public/game.js')));
+
 const PORT = process.env.PORT || 3000;
 
 config.liveReload(app);
@@ -41,6 +44,20 @@ config.Socket(io, app, sessionMiddleware);
 //replaced with script in package.json, automatically knows to call npx
 //replaced with nodemon --exec ts-node src/server/index.ts so we don't have to kill and restart the server every time we make an update to the site
 //still must restart server IF new dependency is imported, add NODE_ENV=production to beginning to get non-dev version of errors
+
+// --- SOCKET.IO: Handle 'rejoin' event for reconnects ---
+io.on('connection', (socket) => {
+  socket.on('rejoin', async ({ gameId }) => {
+    try {
+      // Dynamically import Game to avoid circular deps
+      const { default: Game } = await import('./db/games/index');
+      const state = await Game.loadState(Number(gameId));
+      socket.emit('gameState', state);
+    } catch (e) {
+      socket.emit('gameState', {});
+    }
+  });
+});
 
 //husky: library that allows us to define "kit hooks"
 //there are life cycle events that happen when working with the git repository

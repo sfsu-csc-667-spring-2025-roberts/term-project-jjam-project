@@ -16,38 +16,133 @@
                 />
                 Welcome <%= user.email %> (<%= user.id %>)
             </h1> 
+                <div class="games-list">
+                <% if (activeGames && activeGames.length) { %>
+                  <% activeGames.forEach(function(game) { %>
+                    <div class="game-entry">
+                      <span>Game <%= game.id %> - <%= game.status %></span>
+                      <form action="/games/<%= game.id %>" method="get" style="display:inline;">
+                        <button type="submit" class="rejoin-btn">Rejoin</button>
+                      </form>
+                    </div>
+                  <% }) %>
+                <% } else { %>
+                  <span>No active games to rejoin.</span>
+                <% } %>
+            </div>
                 <div id="content">
                     
                     <section id="game-listing">
-                        <button id="create-game-button">Create Game</button>
-                        <ul id="available-games">
-                            <li>
-                                <span class="status waiting">status</span>
-                                <span class="game-name">Game 1</span>
-                                <span class="game-players">Players</span>
-                                <form method="post" action="/games/join/1">
-                                    <button type="submit">Join</button>
-                                </form>
-                            </li>
-                            <li>
-                                <span class="status waiting">status</span>
-                                <span class="game-name">Game 2</span>
-                                <span class="game-players">Players</span>
-                                <form method="post" action="/games/join/2">
-                                        <input type="text" name="password">
-                                    <button type="submit">Join</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </section>
+  <div class="lobby-header">
+    <button id="create-game-button">Create Game</button>
+    <h2>Available Games</h2>
+  </div>
+  <ul id="available-games" aria-label="Available Games">
+    <!-- Example game entry, repeat for each game from backend -->
+    <li class="lobby-game" tabindex="0" aria-label="Game 1, waiting for players">
+      <span class="status waiting" title="Waiting for players">🟡 Waiting</span>
+      <span class="game-name">Game 1</span>
+      <span class="game-players"><img class="avatar" src="https://gravatar.com/avatar/1?s=20&d=identicon" alt="Player 1 avatar"> 2/4</span>
+      <form method="post" action="/games/join/1">
+        <button type="submit" aria-label="Join Game 1">Join</button>
+      </form>
+      <button class="leave-btn" disabled title="Leave game (stub)" aria-label="Leave Game 1">Leave</button>
+    </li>
+    <li class="lobby-game" tabindex="0" aria-label="Game 2, full">
+      <span class="status full" title="Full">🔴 Full</span>
+      <span class="game-name">Game 2</span>
+      <span class="game-players"><img class="avatar" src="https://gravatar.com/avatar/2?s=20&d=identicon" alt="Player 2 avatar"> 4/4</span>
+      <form method="post" action="/games/join/2">
+        <input type="text" name="password" placeholder="Password" aria-label="Game password">
+        <button type="submit" aria-label="Join Game 2">Join</button>
+      </form>
+      <button class="leave-btn" disabled title="Leave game (stub)" aria-label="Leave Game 2">Leave</button>
+    </li>
+    
+  </ul>
+  <style>
+    
+    #available-games { animation: fadeInUp 0.7s cubic-bezier(.23,1.02,.46,1.11) both; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to { opacity: 1; transform: none; }
+    }
+    
+    .lobby-game button:not(:disabled):hover, .lobby-game .leave-btn:not(:disabled):hover {
+      animation: pulse 0.28s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.07); }
+      100% { transform: scale(1); }
+    }
+    .lobby-game:focus {
+      outline: 2px solid #4f8cff;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px #4f8cff33;
+    }
+  </style>
+    .lobby-header { display: flex; align-items: center; gap: 18px; margin-bottom: 10px; }
+    .lobby-header h2 { margin: 0; font-size: 1.2rem; color: #4f8cff; letter-spacing: 1px; }
+    #available-games { list-style: none; padding: 0; margin: 0; }
+    .lobby-game { display: flex; align-items: center; gap: 16px; background: #23272f; border-radius: 8px; margin-bottom: 12px; padding: 10px 16px; box-shadow: 0 2px 8px #0003; transition: background 0.18s; }
+    .lobby-game:hover { background: #2e3440; }
+    .lobby-game .avatar { border-radius: 50%; width: 20px; height: 20px; margin-right: 4px; }
+    .status { font-size: 1.1rem; font-weight: bold; margin-right: 8px; }
+    .status.waiting { color: #ffb703; }
+    .status.full { color: #e63946; }
+    .game-name { font-weight: 600; color: #fff; min-width: 90px; }
+    .game-players { color: #bcd; font-size: 1rem; display: flex; align-items: center; }
+    .lobby-game form, .lobby-game .leave-btn { margin-left: auto; }
+    .lobby-game button, .lobby-game .leave-btn { border-radius: 6px; border: none; background: #4f8cff; color: #fff; padding: 7px 14px; font-weight: 600; cursor: pointer; transition: background 0.16s; margin-left: 8px; }
+    .lobby-game button:hover:not(:disabled), .lobby-game .leave-btn:hover:not(:disabled) { background: #3760b5; }
+    .lobby-game .leave-btn:disabled { background: #555; cursor: not-allowed; opacity: 0.6; }
+  </style>
+  
+</section>
                     
                     <section id="chat-container">
-                        <div id="messages"></div>
-                        <form>
-                            <input type="text" name="message" id="message"/>
-                            <button type="submit" id="send-button">Send</button>
-                        </form>
-                    </section>
+  <div class="chat-header">Lobby Chat</div>
+  <div id="messages" class="chat-messages" aria-live="polite">
+    <!-- Example chat message, repeat for each message from backend -->
+    <div class="chat-message" tabindex="0"><img class="avatar" src="https://gravatar.com/avatar/1?s=20&d=identicon" alt="Player 1 avatar"><span class="chat-user">Player 1:</span> Hello!</div>
+    <div class="chat-message self" tabindex="0"><img class="avatar" src="https://gravatar.com/avatar/2?s=20&d=identicon" alt="Your avatar"><span class="chat-user">You:</span> Hi!</div>
+    <!-- TODO: Render messages dynamically from backend -->
+  </div>
+  <form class="chat-form">
+    <input type="text" name="message" id="message" placeholder="Type a message..." autocomplete="off" aria-label="Type a message" />
+    <button type="submit" id="send-button" aria-label="Send message">Send</button>
+  </form>
+  <style>
+    
+    .chat-message { animation: chatFadeIn 0.4s cubic-bezier(.23,1.02,.46,1.11) both; }
+    @keyframes chatFadeIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: none; }
+    }
+    .chat-message:focus {
+      outline: 2px solid #ffb703;
+      outline-offset: 2px;
+      box-shadow: 0 0 0 3px #ffb70344;
+    }
+    .chat-form input:focus {
+      outline: 2px solid #4f8cff;
+      box-shadow: 0 0 0 3px #4f8cff44;
+    }
+  </style>
+    #chat-container { background: #1a2130; border-radius: 10px; box-shadow: 0 2px 8px #0005; margin-top: 22px; padding: 12px 16px 10px 16px; max-width: 420px; }
+    .chat-header { color: #4f8cff; font-weight: 700; margin-bottom: 6px; font-size: 1.09rem; }
+    .chat-messages { min-height: 60px; max-height: 140px; overflow-y: auto; margin-bottom: 8px; font-size: 0.99rem; }
+    .chat-message { display: flex; align-items: center; margin-bottom: 4px; gap: 6px; padding: 2px 0; }
+    .chat-message.self .chat-user { color: #ffb703; }
+    .chat-message .avatar { border-radius: 50%; width: 20px; height: 20px; margin-right: 2px; }
+    .chat-form { display: flex; gap: 6px; }
+    .chat-form input { flex: 1; border-radius: 6px; border: none; padding: 7px 10px; font-size: 1rem; background: #23272f; color: #eee; }
+    .chat-form button { background: #4f8cff; color: #fff; border: none; border-radius: 6px; padding: 7px 16px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.18s; }
+    .chat-form button:hover { background: #3760b5; }
+  </style>
+  
+</section>
                 </div> 
         </div>
         <%- include("games/create-form") %>

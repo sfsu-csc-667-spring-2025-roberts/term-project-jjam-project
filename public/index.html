@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crazy-8s Online</title>
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/includes/variables.css">
+  <style>
+    body {
+      background: linear-gradient(120deg, #23272f 0%, #4f8cff 100%);
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .landing {
+      background: rgba(34, 39, 47, 0.95);
+      border-radius: 24px;
+      box-shadow: 0 10px 32px #000a;
+      padding: 48px 36px 36px 36px;
+      max-width: 420px;
+      width: 95vw;
+      text-align: center;
+      margin: 40px auto 0 auto;
+    }
+    .landing h1 {
+      font-size: 2.7rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+      color: #4f8cff;
+    }
+    .landing p {
+      font-size: 1.18rem;
+      color: #dbeafe;
+      margin-bottom: 26px;
+    }
+    .landing-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .landing-nav a {
+      display: block;
+      background: #4f8cff;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 7px;
+      padding: 14px 0;
+      font-size: 1.15rem;
+      transition: background 0.18s, transform 0.12s;
+      box-shadow: 0 2px 8px #0005;
+    }
+    .landing-nav a:hover {
+      background: #3760b5;
+      transform: translateY(-3px) scale(1.04);
+    }
+    .credit {
+      margin-top: 38px;
+      font-size: 0.98rem;
+      color: #bcd;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="landing">
+    <h1>Crazy-8s Online</h1>
+    <p>
+      Play the classic card game Crazy-8s with friends!<br>
+      Join lobbies, chat, and enjoy a fully-featured online experience.<br>
+      <span style="color:#ffb703;">No backend required for demo mode.</span>
+    </p>
+    <div class="landing-nav">
+      <a href="/crazy8s-static.html">Game Board Demo</a>
+      <a href="/lobby">Lobby (Server Template)</a>
+      <a href="#" onclick="alert('Login/Register not implemented in static demo.')">Login / Register</a>
+    </div>
+    <div class="credit">CSC 667 Spring 2025 &mdash; Team JJAM</div>
+  </div>
+</body>
+</html>

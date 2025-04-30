@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crazy-8s Game Board (Static Mockup)</title>
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/includes/variables.css">
+  <link rel="stylesheet" href="/css/includes/create-game-form.css">
+  <style>
+    body {
+      background: #1a1a1a;
+      color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .crazy8s-board {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #23272f;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px #000a;
+      padding: 32px 24px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .game-title {
+      font-size: 2.3rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+    .players {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 32px;
+    }
+    .player {
+      flex: 1;
+      text-align: center;
+      padding: 8px 0;
+      font-size: 1.1rem;
+      background: #2e3440;
+      border-radius: 9px;
+      margin: 0 8px;
+      opacity: 0.85;
+    }
+    .player.active {
+      background: #4f8cff;
+      color: #fff;
+      font-weight: bold;
+      opacity: 1;
+    }
+    .table {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .deck, .discard {
+      width: 90px;
+      height: 128px;
+      border-radius: 12px;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: bold;
+      box-shadow: 0 2px 8px #000a;
+      margin: 0 24px;
+      position: relative;
+    }
+    .deck {
+      background: repeating-linear-gradient(135deg, #444 0 10px, #222 10px 20px);
+      color: #fff;
+    }
+    .discard {
+      background: #fff;
+      color: #222;
+      border: 2px solid #4f8cff;
+    }
+    .table-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .hand {
+      display: flex;
+      justify-content: center;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+    .card {
+      width: 70px;
+      height: 100px;
+      background: #fff;
+      color: #222;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px #0005;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0 8px;
+      position: relative;
+      transition: transform 0.15s;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-8px) scale(1.07);
+      box-shadow: 0 6px 24px #4f8cff88;
+      z-index: 2;
+    }
+    .card.suit-hearts { color: #e63946; }
+    .card.suit-diamonds { color: #ffb703; }
+    .card.suit-clubs { color: #457b9d; }
+    .card.suit-spades { color: #222; }
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+    }
+    .action-btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      background: #4f8cff;
+      color: #fff;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .action-btn:hover {
+      background: #3760b5;
+    }
+  </style>
+</head>
+<body>
+  <div class="crazy8s-layout">
+    <!-- Players Sidebar -->
+    <aside class="players-sidebar">
+      <h2>Players</h2>
+      <ul>
+        <li class="player-entry active">
+          <img src="https://gravatar.com/avatar/1?s=32&d=identicon" alt="Avatar" class="avatar"> You <span class="cards-left">6 cards</span> <span class="turn-indicator">&larr; Your turn</span>
+        </li>
+        <li class="player-entry">
+          <img src="https://gravatar.com/avatar/2?s=32&d=identicon" alt="Avatar" class="avatar"> Player 2 <span class="cards-left">5 cards</span>
+        </li>
+        <li class="player-entry">
+          <img src="https://gravatar.com/avatar/3?s=32&d=identicon" alt="Avatar" class="avatar"> Player 3 <span class="cards-left">3 cards</span>
+        </li>
+        <li class="player-entry">
+          <img src="https://gravatar.com/avatar/4?s=32&d=identicon" alt="Avatar" class="avatar"> Player 4 <span class="cards-left">1 card</span>
+        </li>
+      </ul>
+    </aside>
+    <!-- Main Board -->
+    <main class="crazy8s-board">
+      <div class="game-title">Crazy-8s</div>
+      <div class="table">
+        <div class="table-row">
+          <div class="deck" title="Draw pile">🂠</div>
+          <div class="discard" title="Top of discard pile">
+            <span class="card suit-hearts">8♥</span>
+          </div>
+        </div>
+      </div>
+      <div class="hand-label">Your Hand</div>
+      <div class="hand">
+        <div class="card suit-hearts">A♥</div>
+        <div class="card suit-diamonds">8♦</div>
+        <div class="card suit-clubs">K♣</div>
+        <div class="card suit-spades">2♠</div>
+        <div class="card suit-hearts">5♥</div>
+        <div class="card suit-diamonds">Q♦</div>
+      </div>
+      <div class="actions">
+        <button class="action-btn">Play Card</button>
+        <button class="action-btn">Draw Card</button>
+        <button class="action-btn">Pass</button>
+      </div>
+      <!-- In-game Chat Box (static demo) -->
+      <section class="game-chat">
+        <div class="chat-header">Game Chat</div>
+        <div class="chat-messages">
+          <div class="chat-message"><span class="chat-avatar"><img src="https://gravatar.com/avatar/2?s=20&d=identicon"></span><span class="chat-user">Player 2:</span> Good luck!</div>
+          <div class="chat-message self"><span class="chat-avatar"><img src="https://gravatar.com/avatar/1?s=20&d=identicon"></span><span class="chat-user">You:</span> Let's go!</div>
+        </div>
+        <form class="chat-form" onsubmit="event.preventDefault();">
+          <input type="text" placeholder="Type a message..." disabled>
+          <button type="submit" disabled>Send</button>
+        </form>
+      </section>
+      <div class="demo-note">
+        TODO: Integrate with backend for real game logic, chat, and state sync.
+      </div>
+    </main>
+  </div>
+  <style>
+    .crazy8s-layout {
+      display: flex;
+      flex-direction: row;
+      min-height: 100vh;
+      background: #1a1a1a;
+    }
+    .players-sidebar {
+      background: #23272f;
+      min-width: 210px;
+      padding: 32px 14px 14px 14px;
+      border-radius: 0 16px 16px 0;
+      box-shadow: 2px 0 20px #0006;
+      color: #eee;
+      margin-right: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .players-sidebar h2 {
+      font-size: 1.2rem;
+      margin-bottom: 18px;
+      color: #4f8cff;
+      letter-spacing: 1px;
+    }
+    .players-sidebar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      width: 100%;
+    }
+    .player-entry {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-size: 1.09rem;
+      background: #2e3440;
+      border-radius: 6px;
+      padding: 6px 10px;
+      opacity: 0.85;
+      transition: background 0.18s;
+    }
+    .player-entry.active {
+      background: #4f8cff;
+      color: #fff;
+      opacity: 1;
+      font-weight: bold;
+    }
+    .player-entry .avatar {
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      margin-right: 6px;
+    }
+    .player-entry .cards-left {
+      margin-left: auto;
+      font-size: 0.97rem;
+      color: #bcd;
+    }
+    .player-entry .turn-indicator {
+      color: #ffb703;
+      font-size: 0.93rem;
+      margin-left: 8px;
+      font-weight: 700;
+    }
+    .crazy8s-board {
+      flex: 1;
+      max-width: 900px;
+      margin: 32px auto 32px auto;
+      background: #23272f;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px #000a;
+      padding: 32px 24px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .game-title {
+      font-size: 2.3rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+    .table {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .deck, .discard {
+      width: 90px;
+      height: 128px;
+      border-radius: 12px;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: bold;
+      box-shadow: 0 2px 8px #000a;
+      margin: 0 24px;
+      position: relative;
+    }
+    .deck {
+      background: repeating-linear-gradient(135deg, #444 0 10px, #222 10px 20px);
+      color: #fff;
+      cursor: pointer;
+      transition: box-shadow 0.18s;
+    }
+    .deck:hover {
+      box-shadow: 0 6px 24px #4f8cff88;
+    }
+    .discard {
+      background: #fff;
+      color: #222;
+      border: 2px solid #4f8cff;
+    }
+    .table-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .hand-label {
+      margin-top: 12px;
+      margin-bottom: 2px;
+      color: #bcd;
+      font-size: 1.13rem;
+      font-weight: 500;
+    }
+    .hand {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .card {
+      width: 70px;
+      height: 100px;
+      background: #fff;
+      color: #222;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px #0005;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 0 8px;
+      position: relative;
+      transition: transform 0.15s, box-shadow 0.18s;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-8px) scale(1.07);
+      box-shadow: 0 6px 24px #4f8cff88;
+      z-index: 2;
+    }
+    .card.suit-hearts { color: #e63946; }
+    .card.suit-diamonds { color: #ffb703; }
+    .card.suit-clubs { color: #457b9d; }
+    .card.suit-spades { color: #222; }
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 12px;
+    }
+    .action-btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      background: #4f8cff;
+      color: #fff;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.13s;
+    }
+    .action-btn:hover {
+      background: #3760b5;
+      transform: translateY(-2px) scale(1.04);
+    }
+    /* In-game Chat Styles */
+    .game-chat {
+      background: #1a2130;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px #0005;
+      margin-top: 32px;
+      width: 100%;
+      max-width: 360px;
+      padding: 10px 12px 8px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .chat-header {
+      color: #4f8cff;
+      font-weight: 700;
+      margin-bottom: 6px;
+      font-size: 1.09rem;
+    }
+    .chat-messages {
+      min-height: 60px;
+      max-height: 120px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+      font-size: 0.99rem;
+    }
+    .chat-message {
+      display: flex;
+      align-items: center;
+      margin-bottom: 4px;
+      gap: 6px;
+      padding: 2px 0;
+    }
+    .chat-message.self .chat-user {
+      color: #ffb703;
+    }
+    .chat-avatar img {
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      margin-right: 2px;
+    }
+    .chat-form {
+      display: flex;
+      gap: 6px;
+    }
+    .chat-form input {
+      flex: 1;
+      border-radius: 6px;
+      border: none;
+      padding: 7px 10px;
+      font-size: 1rem;
+      background: #23272f;
+      color: #eee;
+    }
+    .chat-form button {
+      background: #4f8cff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    .chat-form button:hover {
+      background: #3760b5;
+    }
+    .demo-note {
+      margin-top: 28px;
+      color: #bcd;
+      font-size: 0.98rem;
+      text-align: center;
+      opacity: 0.7;
+    }
+    @media (max-width: 800px) {
+      .crazy8s-layout {
+        flex-direction: column;
+      }
+      .players-sidebar {
+        min-width: 100%;
+        flex-direction: row;
+        border-radius: 0 0 16px 16px;
+        margin-right: 0;
+        margin-bottom: 18px;
+        justify-content: center;
+      }
+      .players-sidebar ul {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        width: 100%;
+        justify-content: center;
+      }
+      .player-entry {
+        margin-bottom: 0;
+        margin-right: 8px;
+        min-width: 120px;
+      }
+    }
+  </style>
+</body>
+</html>

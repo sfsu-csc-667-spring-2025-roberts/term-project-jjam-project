@@ -17,4 +17,13 @@ const join = async (userId: number, gameId: number, password: string = "") =>{
     return playerCount;
 }
 
-export default { create, join }
+const saveState = async (gameId: number, state: object) => {
+    await db.none('UPDATE games SET state = $1 WHERE id = $2', [JSON.stringify(state), gameId]);
+};
+
+const loadState = async (gameId: number) => {
+    const { state } = await db.one('SELECT state FROM games WHERE id = $1', [gameId]);
+    return state;
+};
+
+export default { create, join, saveState, loadState }

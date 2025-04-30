@@ -18,5 +18,8 @@
     <div class="text-center">
         <p class="text-4xl font-bold text-blue-600"><%= gameId %></p>
     </div>
+    <script>
+      window.GAME_STATE = <%- JSON.stringify(gameState) %>;
+    </script>
 </body>
 </html>
