@@ -1,5 +1,5 @@
 import db from "../connection";
-import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL } from "./sql";
+import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, IS_HOST_SQL } from "./sql";
 
 // const CREATE_SQL = `INSERT INTO games (name, min_players, max_players, password) VALUES ($1, $2, $3, $4) RETURNING id`;
 // const ADD_PLAYER = `INSERT INTO game_users (game_id, user_id) VALUES ($1, $2)`;
@@ -17,4 +17,10 @@ const join = async (userId: number, gameId: number, password: string = "") =>{
     return playerCount;
 }
 
-export default { create, join }
+const getHost = async (gameId: number) => {
+    const { user_id } = await db.one<{user_id: number}>(IS_HOST_SQL, [gameId]);
+
+    return user_id;
+}
+
+export default { create, join, getHost }

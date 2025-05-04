@@ -24,3 +24,6 @@ RETURNING (
     SELECT COUNT(*) AS playerCount FROM game_users WHERE game_id=$(gameId)
 )
 `;
+
+export const IS_HOST_SQL = `
+SELECT user_id FROM game_users ORDER BY seat LIMIT 1`;

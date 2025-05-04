@@ -1,13 +1,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Crazy Eights | Lobby</title>
+    <title>Crazy Eights | Game <%= gameId %></title>
     <%- include('shared/head') %>
 </head>
 <body>
     <div id="container">
         <%- include('shared/menu') %>
-        <script src="\js\lobby\index.js" defer></script>
+        <script src="\js\games\index.js" defer></script>
         <h1>
             <img
                 src="https://gravatar.com/avatar/ <%= user.gravatar%>?s=30&d=identicon"
@@ -16,12 +16,17 @@
             />
             Welcome <%= user.email %> (<%= user.id %>)
         </h1>
-        <div id="content">
-            <div class="text-center">
-                <button id="start-game">Start Game</button>
-                <p class="text-4xl font-bold text-blue-600"><%= gameId %></p>
-            </div>
-            
+            <div id="content">
+                <section id= "game">
+                
+
+                    <div class="text-center">
+                        <% if(isHost) { %>
+                        <button id="start-game-button">Start Game</button>
+                        <% } %>
+                        <p><%= gameId %></p>
+                    </div>
+                </section>
             <section id="chat-container">
                 <div id="messages"></div>
                 <form>

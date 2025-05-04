@@ -36,9 +36,17 @@ router.post("/join/:gameId", async (request: Request, response: Response) => {
     }
 });
 
-router.get("/:gameId", (request: Request, response: Response) => {
-    const { gameId } = request.params;
-    response.render("games", { gameId });
+router.get("/:gameId", async (request: Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+
+    //@ts-ignore
+    const{ id: userId } = request.session.user;
+    const hostId = await Game.getHost(gameId);
+
+    //console.log({hostId, userId, gameId});
+
+    response.render("games", { gameId, isHost: hostId === userId });
 });
 
 export default router;

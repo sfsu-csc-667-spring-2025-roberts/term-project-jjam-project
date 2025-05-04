@@ -110,7 +110,7 @@ server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`); //use backticks instead of ' or " (same key as ~, above tab)
 });
 
-
+//how to do
 //postgres stuff:
 //to create postgres database: createdb -U postgres spring-2025 (password=1234)
 //to see database: psql -U postgres spring-2025
@@ -139,6 +139,9 @@ server.listen(PORT, () => {
 //to undo creation of test_table
 //npm run db:rollback
 
+//to clear players from game 1
+//select * from game_users;
+//delete from game_users where game_id = 1;
 
 //2:00:51
 
