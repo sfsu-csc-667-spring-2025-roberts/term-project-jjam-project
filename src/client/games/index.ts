@@ -15,8 +15,8 @@ function getGameId(): string | number {
 
 startGameButton?.addEventListener("click", event =>{
     event.preventDefault();
-    console.log(`games/${getGameId()}/start)`);
-    fetch(`games/${getGameId()}/start)`, {
+    console.log(`games/${getGameId()}/start`);
+    fetch(`${getGameId()}/start`, {
         method: "post",
     });
 })

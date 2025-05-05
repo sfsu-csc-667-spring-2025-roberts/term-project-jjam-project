@@ -44,9 +44,47 @@ router.get("/:gameId", async (request: Request, response: Response) => {
     const{ id: userId } = request.session.user;
     const hostId = await Game.getHost(gameId);
 
-    //console.log({hostId, userId, gameId});
+    console.log({hostId, userId, gameId});
 
     response.render("games", { gameId, isHost: hostId === userId });
+});
+
+router.post("/:gameId/start", async (request:Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+
+    //@ts-ignore
+    const { id: userId } = request.session.user;
+    const hostId = await Game.getHost(gameId);
+
+    console.log({gameId, userId, hostId});
+
+    //validation
+    //ensure host is starting
+    if(hostId !== userId){
+        response.status(200).send();
+        return;
+    }
+    //ensure there are minimum number of players
+    const gameInfo = await Game.getInfo(gameId);
+    //console.log({gameInfo});
+
+    if(gameInfo.min_players < gameInfo.player_count){
+
+        //TODO: Broadcast game update stating "not enough players"
+        response.status(200).send();
+        return;
+    }
+    await Game.start(gameId);
+
+    //add cards to game
+    //deal cards
+    //set current player
+    //let players know the game has started
+
+
+
+    response.status(200).send();
 });
 
 export default router;
