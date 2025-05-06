@@ -82,6 +82,8 @@ router.post("/:gameId/start", async (request:Request, response: Response) => {
     //set current player
     //let players know the game has started
 
+    const gameState = await Game.getState(gameId);
+    console.log({gameState});
 
 
     response.status(200).send();

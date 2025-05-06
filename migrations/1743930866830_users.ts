@@ -24,6 +24,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
         },
         
     });
+    //  Insert the "deck" user with id 0.  Important:  Explicitly set the ID.
+    pgm.sql(`
+        INSERT INTO users (id, email, password, created_at, updated_at)
+        VALUES (0, 'deck_user@example.com', 'deck_password', now(), now());
+    `);
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
