@@ -1,2 +1,1 @@
-//console.log("Hello from the client (games)");
-
+console.log("Hello from the client (games)");
