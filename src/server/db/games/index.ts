@@ -1,29 +1,85 @@
-import db from "../connection";
-import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL } from "./sql";
+import fs from "fs";
+import path from "path";
 
-// const CREATE_SQL = `INSERT INTO games (name, min_players, max_players, password) VALUES ($1, $2, $3, $4) RETURNING id`;
-// const ADD_PLAYER = `INSERT INTO game_users (game_id, user_id) VALUES ($1, $2)`;
+const DB_PATH = path.join(__dirname, "games.json");
 
-const create = async (name: string, minPlayers: string, maxPlayers: string, password: string, userId: number) => {
-    const { id: gameId } = await db.one<{id: number}>(CREATE_SQL, [name, minPlayers, maxPlayers, password,]);
-
-    await db.none(ADD_PLAYER, [gameId, userId]);
-
-    return gameId;
+export interface Lobby {
+    id: string;
+    name: string;
+    host: string;
+    players: string[];
+    created: number;
+    started: boolean;
+    chat: { user: string; message: string; time: number }[];
+    gameId?: string;
 }
 
-const join = async (userId: number, gameId: number, password: string = "") =>{
-    const { playerCount } = await db.one(CONDITIONALLY_JOIN_SQL, {gameId, userId, password});
-    return playerCount;
+export interface GameState {
+    id: string;
+    lobbyId: string;
+    players: string[];
+    hands: { [userId: string]: string[] };
+    deck: string[];
+    discard: string[];
+    currentPlayer: string;
+    direction: number;
+    winner?: string;
+    started: boolean;
+    chat: { user: string; message: string; time: number }[];
+    lastAction: number;
 }
 
-const saveState = async (gameId: number, state: object) => {
-    await db.none('UPDATE games SET state = $1 WHERE id = $2', [JSON.stringify(state), gameId]);
-};
+function loadDB(): { lobbies: Lobby[]; games: GameState[] } {
+    if (!fs.existsSync(DB_PATH)) {
+        fs.writeFileSync(DB_PATH, JSON.stringify({ lobbies: [], games: [] }, null, 2));
+    }
+    return JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
+}
 
-const loadState = async (gameId: number) => {
-    const { state } = await db.one('SELECT state FROM games WHERE id = $1', [gameId]);
-    return state;
-};
+function saveDB(data: { lobbies: Lobby[]; games: GameState[] }) {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+}
 
-export default { create, join, saveState, loadState }
+export function getLobbies(): Lobby[] {
+    return loadDB().lobbies;
+}
+
+export function getLobby(id: string): Lobby | undefined {
+    return getLobbies().find(l => l.id === id);
+}
+
+export function saveLobby(lobby: Lobby) {
+    const db = loadDB();
+    const idx = db.lobbies.findIndex(l => l.id === lobby.id);
+    if (idx >= 0) db.lobbies[idx] = lobby;
+    else db.lobbies.push(lobby);
+    saveDB(db);
+}
+
+export function deleteLobby(id: string) {
+    const db = loadDB();
+    db.lobbies = db.lobbies.filter(l => l.id !== id);
+    saveDB(db);
+}
+
+export function getGames(): GameState[] {
+    return loadDB().games;
+}
+
+export function getGame(id: string): GameState | undefined {
+    return getGames().find(g => g.id === id);
+}
+
+export function saveGame(game: GameState) {
+    const db = loadDB();
+    const idx = db.games.findIndex(g => g.id === game.id);
+    if (idx >= 0) db.games[idx] = game;
+    else db.games.push(game);
+    saveDB(db);
+}
+
+export function deleteGame(id: string) {
+    const db = loadDB();
+    db.games = db.games.filter(g => g.id !== id);
+    saveDB(db);
+}
