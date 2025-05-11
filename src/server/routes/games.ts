@@ -1,5 +1,5 @@
 import express from "express";
-import {Request, Response } from "express";
+import { Request, Response } from "express";
 
 import { Game } from "../db";
 
@@ -14,8 +14,8 @@ router.post("/create", async (request: Request, response: Response) => {
         const gameId = await Game.create(description, minPlayers, maxPlayers, password, userId);
 
         response.redirect(`/games/${gameId}`);
-    }catch (error) {
-        console.log({error});
+    } catch (error) {
+        console.log({ error });
         response.redirect("/lobby");
     }
 });
@@ -24,14 +24,14 @@ router.post("/join/:gameId", async (request: Request, response: Response) => {
     const { gameId } = request.params;
     const { password } = request.body;
     //@ts-ignore
-    const{ id: userId } = request.session.user;
+    const { id: userId } = request.session.user;
 
-    try { 
+    try {
         const playerCount = await Game.join(userId, parseInt(gameId), password);
-        console.log({playerCount});
+        console.log({ playerCount });
         response.redirect(`/games/${gameId}`);
-    } catch(error){
-        console.log({error});
+    } catch (error) {
+        console.log({ error });
         response.redirect("/lobby");
     }
 });
@@ -41,15 +41,17 @@ router.get("/:gameId", async (request: Request, response: Response) => {
     const gameId = parseInt(paramsGameId);
 
     //@ts-ignore
-    const{ id: userId } = request.session.user;
+    const { id: userId } = request.session.user;
     const hostId = await Game.getHost(gameId);
+    //@ts-ignore
+    const user = request.session.user; // Access the user object from the session
 
-    console.log({hostId, userId, gameId});
+    console.log({ hostId, userId, gameId, user });
 
-    response.render("games", { gameId, isHost: hostId === userId });
+    response.render("games", { gameId, isHost: hostId === userId, user });
 });
 
-router.post("/:gameId/start", async (request:Request, response: Response) => {
+router.post("/:gameId/start", async (request: Request, response: Response) => {
     const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
 
@@ -57,11 +59,11 @@ router.post("/:gameId/start", async (request:Request, response: Response) => {
     const { id: userId } = request.session.user;
     const hostId = await Game.getHost(gameId);
 
-    console.log({gameId, userId, hostId});
+    console.log({ gameId, userId, hostId });
 
     //validation
     //ensure host is starting
-    if(hostId !== userId){
+    if (hostId !== userId) {
         response.status(200).send();
         return;
     }
@@ -69,7 +71,7 @@ router.post("/:gameId/start", async (request:Request, response: Response) => {
     const gameInfo = await Game.getInfo(gameId);
     //console.log({gameInfo});
 
-    if(gameInfo.min_players < gameInfo.player_count){
+    if (gameInfo.min_players < gameInfo.player_count) {
 
         //TODO: Broadcast game update stating "not enough players"
         response.status(200).send();
@@ -83,7 +85,7 @@ router.post("/:gameId/start", async (request:Request, response: Response) => {
     //let players know the game has started
 
     const gameState = await Game.getState(gameId);
-    console.log({gameState});
+    console.log({ gameState });
 
 
     response.status(200).send();
@@ -105,5 +107,17 @@ router.get("/:gameId/hand", async (request: Request, response: Response) => {
     }
 });
 
+router.get("/:gameId/players", async (request: Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+
+    try {
+        const players = await Game.getPlayersWithHandCount(gameId);
+        response.status(200).json(players);
+    } catch (error) {
+        console.error("Error fetching players with hand count:", error);
+        response.status(500).send("Failed to fetch player information");
+    }
+});
 
 export default router;

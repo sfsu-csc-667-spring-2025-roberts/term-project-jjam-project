@@ -1,7 +1,7 @@
 import { LargeNumberLike } from "crypto";
 import { DBGameUser, GameInfo, PlayerInfo, User } from "../../../../types/global";
 import db from "../connection";
-import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, GET_CARD_SQL, GET_GAME_INFO_SQL, GET_PLAYER_HAND_SQL, GET_PLAYERS_SQL, IS_HOST_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL } from "./sql";
+import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, GET_CARD_SQL, GET_GAME_INFO_SQL, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, IS_HOST_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL } from "./sql";
 
 // const CREATE_SQL = `INSERT INTO games (name, min_players, max_players, password) VALUES ($1, $2, $3, $4) RETURNING id`;
 // const ADD_PLAYER = `INSERT INTO game_users (game_id, user_id) VALUES ($1, $2)`;
@@ -32,8 +32,6 @@ const getInfo = async(gameId: number): Promise<GetGameInfoResponse>=> {
     return await db.one<GetGameInfoResponse>(GET_GAME_INFO_SQL, [gameId]);
 };
 
-
-
 const dealCards = async(userId: number, gameId: number, cardCount: number, pile: number) =>{
     await db.none(DEAL_CARDS_SQL, {userId, gameId, cardCount, pile})
 };
@@ -41,6 +39,10 @@ const dealCards = async(userId: number, gameId: number, cardCount: number, pile:
 const getPlayers = async(gameId: number): Promise<(User & DBGameUser)[]> => {
     return await db.many(GET_PLAYERS_SQL, gameId);
 };
+
+const getPlayersWithHandCount = async(gameId: number): Promise<{ id: string; email: string; gravatar: string; hand_count: number }[]> => {
+    return await db.many(GET_PLAYERS_WITH_HAND_COUNT_SQL, gameId);
+}
 
 const setCurrentPlayer = async (gameId: number, userId: number) => {
     await db.none(SET_IS_CURRENT_SQL, {gameId, userId, });
@@ -74,15 +76,15 @@ const start = async (gameId: number) =>{
         await dealCards(players[i].id, gameId, 0, STOCK_PILE);//may be vestigial, remove later?
         await dealCards(players[i].id, gameId, 5, PLAYER_HAND);
     }
-    
-    
+
+
     //set current player
     await setCurrentPlayer(gameId, players[0].id);
 };
 
 
 
-const  getState = async (gameId: number) => {
+const  getState = async (gameId: number) => {
     //getInfo(),
     const {name} = await getInfo(gameId);
     console.log({name});
@@ -92,16 +94,16 @@ const  getState = async (gameId: number) => {
     }));
     console.log({players});
 
-    // const result = { 
-    //     name, 
-    //     buildPiles: await Promise.all([NORTH_PILE, EAST_PILE, SOUTH_PILE, WEST_PILE].map((pile) =>{
-    //         return db.one(GET_CARD_SQL, {gameId, pile, userId: 0, limit: 1});
-    //     })), 
-    //     players: {}
-    //     // players: players.reduce((acc, player) => {
-    //     //     acc[player.id] = player;
-    //     //     return acc;
-    //     // }, {} as Record<number, PlayerInfo>), 
+    // const result = {
+    //     name,
+    //     buildPiles: await Promise.all([NORTH_PILE, EAST_PILE, SOUTH_PILE, WEST_PILE].map((pile) =>{
+    //         return db.one(GET_CARD_SQL, {gameId, pile, userId: 0, limit: 1});
+    //     })),
+    //     players: {}
+    //     // players: players.reduce((acc, player) => {
+    //     //     acc[player.id] = player;
+    //     //     return acc;
+    //     // }, {} as Record<number, PlayerInfo>),
     // };
 
     const playerInfo: Record<number, PlayerInfo> = {};
@@ -115,39 +117,39 @@ const  getState = async (gameId: number) => {
                 stockPileTop: await db.one(GET_CARD_SQL, {gameId, userId: id, limit: 0, pile: STOCK_PILE,}),//vestigial, remove later
                 discardPiles: await Promise.all([DISCARD_1, DISCARD_2, DISCARD_3, DISCARD_4].map(pile => {//vestigial, remove later
                     return db.oneOrNone(GET_CARD_SQL, {gameId, userId: id, limit: 0})//vestigial, remove later
-            })),//vestigial, remove later
+                })),//vestigial, remove later
             };
         }catch(error){
             console.error({error});
         }
-        
+
 
         // const hand = await;
         // const stockPileTop
         //result.players[id] = players[i];
     }
 
-    return { 
-        name, 
+    return {
+        name,
         buildPiles: await Promise.all([NORTH_PILE, EAST_PILE, SOUTH_PILE, WEST_PILE].map((pile) =>{
             return db.one(GET_CARD_SQL, {gameId, pile, userId: 0, limit: 1});
-        })), 
+        })),
         players: playerInfo,
         // players: players.reduce((acc, player) => {
-        //     acc[player.id] = player;
-        //     return acc;
-        // }, {} as Record<number, PlayerInfo>), 
+        //     acc[player.id] = player;
+        //     return acc;
+        // }, {} as Record<number, PlayerInfo>),
     };
 
 
     // const result = {
-    //     name,
-    //     //playerIds: players.map(({id}) => id),
-    //     players: players.reduce((acc, player) => {
-    //         acc[player.id] = player;
+    //     name,
+    //     //playerIds: players.map(({id}) => id),
+    //     players: players.reduce((acc, player) => {
+    //         acc[player.id] = player;
 
-    //         return acc;
-    //     }, {} as Record<number, any>
+    //         return acc;
+    //     }, {} as Record<number, any>
     // ),
     // }
     //Need to get
@@ -176,7 +178,7 @@ const getUserHand = async (gameId: number, userId: number) => {
     return await db.manyOrNone(GET_PLAYER_HAND_SQL, { gameId, userId, pile: PLAYER_HAND});
 };
 
-export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, cardLocations: {
+export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, getPlayersWithHandCount, cardLocations: {
     STOCK_PILE: STOCK_PILE,
     PLAYER_HAND: PLAYER_HAND,
     DISCARD_1: DISCARD_1,
@@ -187,5 +189,5 @@ export default { create, join, getHost, getState, getInfo, start, dealCards, get
     NORTH_PILE: NORTH_PILE,
     EAST_PILE: EAST_PILE,
     SOUTH_PILE: SOUTH_PILE,
-    WEST_PILE: WEST_PILE} 
+    WEST_PILE: WEST_PILE}
 };

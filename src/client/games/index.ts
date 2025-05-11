@@ -82,30 +82,68 @@ function getUserId(): string | null {
 }
 
 async function fetchAndUpdateOpponentCardCounts() {
-    if (gameId) {
+    if (gameId && opponentCardCountsDiv) {
         try {
             const response = await fetch(`/games/${gameId}/players`);
             if (!response.ok) {
                 console.error('Failed to fetch player info:', response.status);
+                opponentCardCountsDiv.innerHTML = '<p>Failed to load opponent info.</p>';
                 return;
             }
             const playersData = await response.json();
-            if (opponentCardCountsDiv) {
-                opponentCardCountsDiv.innerHTML = '<h3>Opponent Card Counts</h3>';
-                playersData.forEach((player: { id: string; email: string; hand_count: number }) => {
-                    if (player.id !== currentUserId) {
-                        const opponentInfo = document.createElement('p');
-                        opponentInfo.textContent = `${player.email}: ${player.hand_count} cards`;
-                        opponentCardCountsDiv.appendChild(opponentInfo);
-                    }
-                });
-            }
+            opponentCardCountsDiv.innerHTML = '<h3>Opponent Card Counts</h3>';
+            playersData.forEach((player: { id: string; email: string; hand_count: number }) => {
+                if (player.id !== currentUserId && player.id !== '0' && player.id !== '-1') {
+                    const opponentInfo = document.createElement('p');
+                    opponentInfo.textContent = `${player.email}: ${player.hand_count} cards`;
+                    opponentCardCountsDiv.appendChild(opponentInfo);
+                }
+            });
         } catch (error) {
             console.error('Error fetching player info:', error);
-            if (opponentCardCountsDiv) {
-                opponentCardCountsDiv.innerHTML = '<p>Failed to load opponent info.</p>';
-            }
+            opponentCardCountsDiv.innerHTML = '<p>Failed to load opponent info.</p>';
         }
+    }
+}
+
+async function fetchAndUpdatePlayerHand() {
+    if (gameId && playerHandDiv && playerHandContainer) {
+        try {
+            const response = await fetch(`/games/${gameId}/hand`);
+            if (!response.ok) {
+                console.error('Failed to fetch hand:', response.status);
+                playerHandDiv.textContent = 'Failed to load hand.';
+                playerHandContainer.style.display = 'block';
+                return;
+            }
+            const handData = await response.json();
+            playerHandDiv.innerHTML = ''; //Clear previous hand
+            if (handData && handData.length > 0) {
+                handData.forEach((card: { card_id: number }) => {
+                    //@ts-ignore
+                    const cardInfo = cardMap[card.card_id];
+                    const cardElement = document.createElement('div');
+                    cardElement.classList.add('card', cardInfo?.suit.toLowerCase()); //Add suit as a class for styling
+                    cardElement.textContent = cardInfo?.display || `ID: ${card.card_id}`;
+                    cardElement.addEventListener('click', () => {
+                        console.log(`Clicked card ID: ${card.card_id}`);
+                        //when card is clicked, do something
+                    });
+                    playerHandDiv.appendChild(cardElement);
+                });
+                playerHandContainer.style.display = 'block';
+            } else {
+                //insert game win state here
+                playerHandDiv.textContent = 'Your hand is empty.';
+                playerHandContainer.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error fetching hand:', error);
+            playerHandDiv.textContent = 'Failed to load hand.';
+            playerHandContainer.style.display = 'block';
+        }
+    } else {
+        console.error('Game ID or hand elements not found.');
     }
 }
 
@@ -163,54 +201,15 @@ announcePresenceButton?.addEventListener("click", event => {
 
 showHandButton?.addEventListener('click', async (event) => {
     event.preventDefault();
-    if (gameId) {
-        try {
-            const response = await fetch(`/games/${gameId}/hand`);
-            if (!response.ok) {
-                console.error('Failed to fetch hand:', response.status);
-                return;
-            }
-            const handData = await response.json();
-            if (playerHandDiv) {
-                playerHandDiv.innerHTML = ''; // Clear previous hand
-                if (handData && handData.length > 0) {
-                    handData.forEach((card: { card_id: number }) => {
-                        //@ts-ignore
-                        const cardInfo = cardMap[card.card_id];
-                        const cardElement = document.createElement('div');
-                        cardElement.classList.add('card', cardInfo?.suit.toLowerCase()); // Add suit as a class for styling
-                        cardElement.textContent = cardInfo?.display || `ID: ${card.card_id}`;
-                        cardElement.addEventListener('click', () => {
-                            console.log(`Clicked card ID: ${card.card_id}`);
-                            // Here you would add the logic for what happens when a card is clicked
-                        });
-                        playerHandDiv.appendChild(cardElement);
-                    });
-                    if (playerHandContainer) {
-                        playerHandContainer.style.display = 'block';
-                    }
-                } else {
-                    playerHandDiv.textContent = 'Your hand is empty.';
-                    if (playerHandContainer) {
-                        playerHandContainer.style.display = 'block';
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching hand:', error);
-            if (playerHandDiv && playerHandContainer) {
-                playerHandDiv.textContent = 'Failed to load hand.';
-                playerHandContainer.style.display = 'block';
-            }
-        }
-    } else {
-        console.error('Game ID not found.');
-    }
+    await fetchAndUpdatePlayerHand();
+    await fetchAndUpdateOpponentCardCounts();
 });
 
-// Fetch opponent card counts periodically or when needed
-fetchAndUpdateOpponentCardCounts(); // Initial fetch
+//Fetch and update opponent card counts and player hand every 10 seconds
+setInterval(async () => {
+    await fetchAndUpdateOpponentCardCounts();
+    await fetchAndUpdatePlayerHand();
+}, 10000);
 
-// You might want to update this information more dynamically using WebSockets
-// For a simple example, you could fetch it every few seconds:
-// setInterval(fetchAndUpdateOpponentCardCounts, 5000);
+//Initial fetch of opponent card counts
+fetchAndUpdateOpponentCardCounts();
