@@ -3,23 +3,6 @@
     <meta charset="UTF-8">
     <title>Crazy Eights | Game <%= gameId %></title>
     <%- include('shared/head') %>
-    <style>
-        .card {
-            display: inline-block;
-            border: 1px solid black;
-            padding: 5px;
-            margin: 2px;
-            border-radius: 5px;
-            min-width: 30px;
-            text-align: center;
-        }
-        .card.hearts, .card.diamonds {
-            color: red;
-        }
-        .card.spades, .card.clubs {
-            color: black;
-        }
-    </style>
 </head>
 <body data-user-id="<%= user.id %>">
     <div id="container">
@@ -47,7 +30,7 @@
             <section id="player-info">
                 <div id="opponent-card-counts">
                     </div>
-                <div id="player-hand-container" style="display:none;">
+                <div id="player-hand-container">
                     <h2 id="player-hand-title">Your Hand</h2>
                     <div id="player-hand">
                         </div>

@@ -76,7 +76,7 @@ const start = async (gameId: number) =>{
         await dealCards(players[i].id, gameId, 0, STOCK_PILE);//may be vestigial, remove later?
         await dealCards(players[i].id, gameId, 5, PLAYER_HAND);
     }
-
+    await dealCards(-1, gameId, 1, PLAYER_HAND);//add card to discard pile
 
     //set current player
     await setCurrentPlayer(gameId, players[0].id);

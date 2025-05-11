@@ -106,6 +106,10 @@ async function fetchAndUpdateOpponentCardCounts() {
     }
 }
 
+async function fetchAndUpdateDiscard() {
+    
+}
+
 async function fetchAndUpdatePlayerHand() {
     if (gameId && playerHandDiv && playerHandContainer) {
         try {
@@ -128,6 +132,7 @@ async function fetchAndUpdatePlayerHand() {
                     cardElement.addEventListener('click', () => {
                         console.log(`Clicked card ID: ${card.card_id}`);
                         //when card is clicked, do something
+
                     });
                     playerHandDiv.appendChild(cardElement);
                 });
@@ -146,6 +151,8 @@ async function fetchAndUpdatePlayerHand() {
         console.error('Game ID or hand elements not found.');
     }
 }
+
+
 
 startGameButton?.addEventListener("click", event =>{
     event.preventDefault();

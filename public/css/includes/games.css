@@ -46,7 +46,7 @@
     transform: translateY(-2px);
 }
 
-/* I know, heart should be read, but it's a reference to a tv show. Bonus points if you can figure out which one! */
+/* I know, heart and diamond should be red, and spade and club should be black, but this is a reference to a tv show. Bonus points if you can figure out which one! */
 .s { color: blue; }/* Spade */
 .h { color: black; }/* Heart */
 .d { color: red; }/* Diamond */
