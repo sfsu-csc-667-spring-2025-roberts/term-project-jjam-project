@@ -20,12 +20,28 @@
                     
                     <section id="game-listing">
                         <button id="create-game-button">Create Game</button>
+                        
+                        
                         <ul id="available-games">
+                            <li>
+                                <form form method="post" action="/games/join/<%= roomId %>">
+                                    <div class="mb-3">
+                                        <label for="roomId" class="form-label">Room ID:</label>
+                                        <input type="text" class="form-control" id="roomId" name="roomId" placeholder="Enter Room ID" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="password" class="form-label">Password (optional):</label>
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" />
+                                    </div>
+                                    <button type="submit">Join</button>
+                                </form>
+                            </li>
                             <li>
                                 <span class="status waiting">status</span>
                                 <span class="game-name">Game 1</span>
                                 <span class="game-players">Players</span>
                                 <form method="post" action="/games/join/1">
+                                        <input type="text" name="password" placeholder="Optional Password">
                                     <button type="submit">Join</button>
                                 </form>
                             </li>
@@ -33,8 +49,17 @@
                                 <span class="status waiting">status</span>
                                 <span class="game-name">Game 2</span>
                                 <span class="game-players">Players</span>
-                                <form method="post" action="/games/join/2">
-                                        <input type="text" name="password">
+                                <form method="post" action="/games/join/2 ">
+                                        <input type="text" name="password" placeholder="Optional Password">
+                                    <button type="submit">Join</button>
+                                </form>
+                            </li>
+                            <li>
+                                <span class="status waiting">status</span>
+                                <span class="game-name">Game 4</span>
+                                <span class="game-players">Players</span>
+                                <form method="post" action="/games/join/4 ">
+                                        <input type="text" name="password" placeholder="Optional Password">
                                     <button type="submit">Join</button>
                                 </form>
                             </li>

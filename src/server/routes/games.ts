@@ -89,4 +89,21 @@ router.post("/:gameId/start", async (request:Request, response: Response) => {
     response.status(200).send();
 });
 
+router.get("/:gameId/hand", async (request: Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+
+    //@ts-ignore
+    const { id: userId } = request.session.user;
+
+    try {
+        const hand = await Game.getUserHand(gameId, userId);
+        response.status(200).json(hand);
+    } catch (error) {
+        console.error("Error fetching user hand:", error);
+        response.status(500).send("Failed to fetch hand");
+    }
+});
+
+
 export default router;

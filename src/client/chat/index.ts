@@ -16,7 +16,7 @@ socket.on(`chat:message:${roomId}`, ({message, sender, timestamp}: ChatMessage) 
 
     //allows us to use a premade template instead of building the html within this page every time a message is made
     const container = document.querySelector<HTMLTemplateElement>("#chat-message-template")?.content.cloneNode(true) as HTMLDivElement;
-    
+
     const img = container.querySelector<HTMLImageElement>("img")!;
 
     img.src = `https://gravatar.com/avatar/${sender.gravatar}?d=identicon`;
@@ -41,7 +41,7 @@ chatForm?.addEventListener("submit", (event) => {
     const message = chatInput?.value;
     if (!message){
         return;
-    } 
+    }
     chatInput.value = "";
 
     fetch(`/chat/${roomId}`, {
@@ -56,6 +56,6 @@ chatForm?.addEventListener("submit", (event) => {
         console.error("Error sending message:", error);
     })
 });
-// socket.on("test-event", (data: any) => { 
+// socket.on("test-event", (data: any) => {
 //     console.log("Received test-event:", data);
 // })

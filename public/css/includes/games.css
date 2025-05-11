@@ -1,0 +1,78 @@
+#game-area {
+    display: flex;
+    gap: 20px; /* Space between game section and hand/chat */
+    align-items: flex-start; /* Align items to the top */
+}
+
+#game-section {
+    flex-grow: 1; /* Allow game section to take more space */
+}
+
+#player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#player-hand-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+#player-hand-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#player-hand {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap; /* Allow cards to wrap onto the next line */
+}
+
+.card {
+    padding: 5px;
+    border: 1px solid #ddd;
+    background-color: white;
+    min-width: 70px; /* Adjust width for suit/value */
+    text-align: center;
+    cursor: pointer; /* Indicate the card is clickable */
+    transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* I know, heart should be read, but it's a reference to a tv show. Bonus points if you can figure out which one! */
+.s { color: blue; }/* Spade */
+.h { color: black; }/* Heart */
+.d { color: red; }/* Diamond */
+.c { color: green; }/* Club */
+
+#chat-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #eee;
+    flex-shrink: 0; /* Prevent chat container from shrinking too much */
+    width: 300px; /* Adjust width as needed */
+    display: flex;
+    flex-direction: column;
+}
+
+#messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+}
+
+#chat-container form {
+    display: flex;
+    gap: 5px;
+}
+
+#chat-container input {
+    flex-grow: 1;
+}

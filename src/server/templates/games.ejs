@@ -4,10 +4,10 @@
     <title>Crazy Eights | Game <%= gameId %></title>
     <%- include('shared/head') %>
 </head>
-<body>
+<body data-user-id="<%= user.id %>">
     <div id="container">
         <%- include('shared/menu') %>
-        <script src="\js\games\index.js" defer></script>
+        <script src="/js/games/index.js" defer></script>
         <h1>
             <img
                 src="https://gravatar.com/avatar/ <%= user.gravatar%>?s=30&d=identicon"
@@ -16,23 +16,32 @@
             />
             Welcome <%= user.email %> (<%= user.id %>)
         </h1>
-            <div id="content">
-                <section id= "game">
-                
-
-                    <div class="text-center">
-                        <% if(isHost) { %>
-                        <button id="start-game-button">Start Game</button>
-                        <% } %>
-                        <p><%= gameId %></p>
+        <div id="game-area">
+            <section id="game-section">
+                <div class="text-center">
+                    <% if(isHost) { %>
+                    <button id="start-game-button">Start Game</button>
+                    <% } %>
+                    <p id="game-id-display"><%= gameId %></p>
+                    <button id="show-hand-button">Show Hand</button>
+                    <button id="announce-presence-button">Announce My Presence</button>
+                </div>
+            </section>
+            <section id="player-info">
+                <div id="opponent-card-counts">
                     </div>
+                <div id="player-hand-container">
+                    <h2 id="player-hand-title">Your Hand</h2>
+                    <div id="player-hand">
+                        </div>
+                </div>
+                <section id="chat-container">
+                    <div id="messages"></div>
+                    <form>
+                        <input type="text" name="message" id="message"/>
+                        <button type="submit" id="send-button">Send</button>
+                    </form>
                 </section>
-            <section id="chat-container">
-                <div id="messages"></div>
-                <form>
-                    <input type="text" name="message" id="message"/>
-                    <button type="submit" id="send-button">Send</button>
-                </form>
             </section>
         </div>
     </div>

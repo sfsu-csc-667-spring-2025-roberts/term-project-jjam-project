@@ -54,6 +54,13 @@ WHERE game_id=$(gameId)
     )
 `;
 
+export const GET_PLAYER_HAND_SQL = `
+SELECT * FROM game_cards
+WHERE game_id=$(gameId)
+    AND user_id=$(userId)
+    AND pile=1;
+`;
+
 export const SET_IS_CURRENT_SQL = `UPDATE game_users SET is_current=(game_users.user_id=$(userId)) WHERE game_id=$(gameId)`;
 
 export const GET_CARD_SQL = `SELECT cards. * FROM cards, game_cards WHERE user_id=$(userId) AND pile=$(pile) AND game_id=$(gameId) ORDER BY game_cards.card_order ASC LIMIT $(limit)`;

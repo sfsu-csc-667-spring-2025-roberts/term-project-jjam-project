@@ -1,7 +1,7 @@
 import { LargeNumberLike } from "crypto";
 import { DBGameUser, GameInfo, PlayerInfo, User } from "../../../../types/global";
 import db from "../connection";
-import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, GET_CARD_SQL, GET_GAME_INFO_SQL, GET_PLAYERS_SQL, IS_HOST_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL } from "./sql";
+import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, GET_CARD_SQL, GET_GAME_INFO_SQL, GET_PLAYER_HAND_SQL, GET_PLAYERS_SQL, IS_HOST_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL } from "./sql";
 
 // const CREATE_SQL = `INSERT INTO games (name, min_players, max_players, password) VALUES ($1, $2, $3, $4) RETURNING id`;
 // const ADD_PLAYER = `INSERT INTO game_users (game_id, user_id) VALUES ($1, $2)`;
@@ -172,7 +172,11 @@ const  getState = async (gameId: number) => {
     */
 };
 
-export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, cardLocations: {
+const getUserHand = async (gameId: number, userId: number) => {
+    return await db.manyOrNone(GET_PLAYER_HAND_SQL, { gameId, userId, pile: PLAYER_HAND});
+};
+
+export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, cardLocations: {
     STOCK_PILE: STOCK_PILE,
     PLAYER_HAND: PLAYER_HAND,
     DISCARD_1: DISCARD_1,
