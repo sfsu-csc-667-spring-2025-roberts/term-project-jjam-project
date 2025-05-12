@@ -108,7 +108,7 @@ router.post("/:gameId/:cardId/discard", async(request: Request, response: Respon
 
     const turnIdPromise = Game.whoTurn(gameId); //Store the Promise
     const turnIdInt = await turnIdPromise; //convert promise to int
-    console.log(`Comparing ${userId} to ${turnIdInt}`);
+    console.log(`Comparing users ${userId} to ${turnIdInt}`);
 
     if(userId != await turnIdInt){
         console.log("Not your turn!");
@@ -118,7 +118,7 @@ router.post("/:gameId/:cardId/discard", async(request: Request, response: Respon
         const discardIdPromise = Game.getDiscardTop(gameId);
         const discardIdObject = await discardIdPromise;
         const discardId = discardIdObject.card_id;
-        console.log(`Comparing ${cardId} and ${discardId}`);
+        console.log(`Comparing cards ${cardId} and ${discardId}`);
 
         // Check for same suit (same chunk of 13)
         const sameSuit = Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
@@ -126,9 +126,17 @@ router.post("/:gameId/:cardId/discard", async(request: Request, response: Respon
         // Check for same rank (difference of 13)
         const sameRank = Math.abs(cardId - discardId) === 13;
         if(sameSuit || sameRank){
-            //move discard card to pile 2
-        //add player's selected card to discard
-        console.log(`Discard successful! ${cardId}`);
+            console.log(`Card being discarded`);
+            //move topdiscard card to pile 2
+            await Game.moveDiscard(gameId);
+
+            console.log(`Discard pile clear!`);
+            //add player's selected card to discard
+            const fromUserId = userId;
+            console.log(`Discarding ${gameId}, ${cardId}, ${fromUserId}`);
+            await Game.discardSelectedCard(gameId, cardId);
+            console.log(`Discard successful! ${cardId}`);
+            response.status(200).send(`Discard successful! ${cardId}`);
         }else{
             console.log("Card doesn't match!");
             response.status(403).send("Card doesn't match!");

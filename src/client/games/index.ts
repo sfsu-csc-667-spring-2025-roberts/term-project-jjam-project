@@ -161,14 +161,33 @@ async function fetchAndUpdatePlayerHand() {
                     cardElement.textContent = cardInfo?.display || `ID: ${card.card_id}`;
                     cardElement.addEventListener('click', () => {
                         console.log(`Clicked card ID: ${card.card_id}`);
-                        //when card is clicked, do something
                         fetch(`${gameId}/${card.card_id}/discard`, {
                             method: "post",
                             headers: {
                                 "Content-Type": "application/json",
                             },
-                        }).catch((error)=>{
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                console.log(`Successfully discarded card ID: ${card.card_id}`);
+                                // Remove the card element from the DOM
+                                cardElement.remove();
+                                // Optionally, refresh the discard pile display immediately
+                                fetchAndUpdateDiscard();
+                                fetchAndUpdateOpponentCardCounts();
+                            } else if (response.status === 403) {
+                                response.text().then(message => {
+                                    console.log(`Discard failed: ${message}`);
+                                    // Optionally, provide feedback to the user (e.g., a message)
+                                });
+                            } else {
+                                console.error("Error discarding card:", response.status);
+                                // Optionally, provide a generic error message to the user
+                            }
+                        })
+                        .catch((error)=>{
                             console.error("Error discarding card:", error);
+                            // Optionally, provide a generic error message to the user
                         });
                     });
                     playerHandDiv.appendChild(cardElement);
