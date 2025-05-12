@@ -131,7 +131,10 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
         // Check for same rank
         const sameRank = cardRank === discardRank;
 
-        if (sameSuit || sameRank) {
+        // Check if the card is an 8
+        const isEight = cardId % 13 === 8; // Assuming card IDs are 1-52, rank 8
+
+        if (sameSuit || sameRank || isEight) {
             console.log(`Card being discarded`);
             //move topdiscard card to pile 2
             await Game.moveDiscard(gameId);
