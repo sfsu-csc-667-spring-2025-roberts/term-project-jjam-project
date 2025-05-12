@@ -163,7 +163,7 @@ router.post("/:gameId/draw", async(request: Request, response: Response) =>{
 
     if(userId != await turnIdInt){
         console.log("Not your turn!");
-        response.status(403).send();
+        response.status(403).send("Not your turn!");
     }else{
         //move card from deck to user's hand
         try {

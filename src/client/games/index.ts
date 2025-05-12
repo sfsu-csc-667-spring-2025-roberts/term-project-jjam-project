@@ -170,24 +170,21 @@ async function fetchAndUpdatePlayerHand() {
                         .then(response => {
                             if (response.ok) {
                                 console.log(`Successfully discarded card ID: ${card.card_id}`);
-                                // Remove the card element from the DOM
+                                //Remove the card element from the DOM
                                 cardElement.remove();
-                                // Optionally, refresh the discard pile display immediately
+                                //update cards on screen
                                 fetchAndUpdateDiscard();
                                 fetchAndUpdateOpponentCardCounts();
                             } else if (response.status === 403) {
                                 response.text().then(message => {
                                     console.log(`Discard failed: ${message}`);
-                                    // Optionally, provide feedback to the user (e.g., a message)
                                 });
                             } else {
                                 console.error("Error discarding card:", response.status);
-                                // Optionally, provide a generic error message to the user
                             }
                         })
                         .catch((error)=>{
                             console.error("Error discarding card:", error);
-                            // Optionally, provide a generic error message to the user
                         });
                     });
                     playerHandDiv.appendChild(cardElement);
@@ -243,10 +240,25 @@ drawCardButton?.addEventListener("click", event =>{
     const gameId = getGameId();
     fetch(`${gameId}/draw`, {
         method: "post",
-    }).catch((error)=>{
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log("Card drawn successfully. Updating UI.");
+            fetchAndUpdatePlayerHand();
+            fetchAndUpdateOpponentCardCounts();
+            fetchAndUpdateDiscard();
+        } else if (response.status === 403) {
+            response.text().then(message => {
+                console.log(`Draw failed: ${message}`);
+            });
+        } else {
+            console.error("Failed to draw card:", response.status);
+        }
+    })
+    .catch((error)=>{
         console.error("Could not draw card:", error);
     });
-})
+});
 
 //test retrieve user and game id
 announcePresenceButton?.addEventListener("click", event => {
@@ -279,19 +291,19 @@ showHandButton?.addEventListener('click', async (event) => {
     await fetchAndUpdateDiscard();
 });
 
-drawCardButton?.addEventListener('click', async (event) => {
-    event.preventDefault();
-    await fetchAndUpdatePlayerHand();
-    await fetchAndUpdateOpponentCardCounts();
-    await fetchAndUpdateDiscard();
-});
+// drawCardButton?.addEventListener('click', async (event) => {
+//     event.preventDefault();
+//     await fetchAndUpdatePlayerHand();
+//     await fetchAndUpdateOpponentCardCounts();
+//     await fetchAndUpdateDiscard();
+// });
 
 //Fetch and update opponent card counts, player hand, and discard every 10 seconds
 setInterval(async () => {
     await fetchAndUpdateOpponentCardCounts();
     await fetchAndUpdatePlayerHand();
     await fetchAndUpdateDiscard(); // Call the new function in the interval
-}, 10000);
+}, 5000);
 
 //Initial fetch of opponent card counts and discard pile
 fetchAndUpdateOpponentCardCounts();
