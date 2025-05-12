@@ -91,6 +91,15 @@ router.post("/:gameId/start", async (request: Request, response: Response) => {
     response.status(200).send();
 });
 
+router.post("/:gameId/:cardId/discard", async(request: Request, response: Response) =>{
+    const { gameId: paramsGameId} = request.params;
+    const gameId = parseInt(paramsGameId);
+
+    const { cardId: paramsCardId} = request.params;
+    const cardId = parseInt(paramsCardId);
+    console.log(`Discard successful! ${cardId}`);
+});
+
 router.get("/:gameId/hand", async (request: Request, response: Response) => {
     const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);

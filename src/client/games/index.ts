@@ -107,7 +107,7 @@ async function fetchAndUpdateOpponentCardCounts() {
 }
 
 async function fetchAndUpdateDiscard() {
-    
+
 }
 
 async function fetchAndUpdatePlayerHand() {
@@ -132,7 +132,14 @@ async function fetchAndUpdatePlayerHand() {
                     cardElement.addEventListener('click', () => {
                         console.log(`Clicked card ID: ${card.card_id}`);
                         //when card is clicked, do something
-
+                        fetch(`${gameId}/${card.card_id}/discard`, {
+                            method: "post",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        }).catch((error)=>{
+                            console.error("Error discarding card:", error);
+                        });
                     });
                     playerHandDiv.appendChild(cardElement);
                 });

@@ -54,6 +54,14 @@ WHERE game_id=$(gameId)
     )
 `;
 
+export const DISCARD_CARD = `
+UPDATE game_cards
+SET user_id = -1, pile= 1 --discard deck
+WHERE game_id = $(gameId) --from this specific game
+AND card_id = $(cardId) --take this specific card
+AND user_id = $(fromUserId) --from this specific player
+`;
+
 export const GET_PLAYER_HAND_SQL = `
 SELECT * FROM game_cards
 WHERE game_id=$(gameId)

@@ -71,7 +71,7 @@ const start = async (gameId: number) =>{
 
     //deal cards
     for(let i = 0; i < players.length; i++){
-        console.log("player");
+        //console.log("player");
         //deal cards to a USER in a GAME with SOME NUMBER OF CARDS into SOME PILE
         await dealCards(players[i].id, gameId, 0, STOCK_PILE);//may be vestigial, remove later?
         await dealCards(players[i].id, gameId, 5, PLAYER_HAND);
