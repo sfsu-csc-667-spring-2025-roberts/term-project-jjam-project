@@ -106,10 +106,37 @@ router.post("/:gameId/:cardId/discard", async(request: Request, response: Respon
     const { id: userId } = request.session.user;
     console.log(`User who is discarding: ${userId}`);
 
-    //check if player's selected card matches the discard card number or suite
-    //move discard card to pile 2
-    //add player's selected card to discard
-    console.log(`Discard successful! ${cardId}`);
+    const turnIdPromise = Game.whoTurn(gameId); //Store the Promise
+    const turnIdInt = await turnIdPromise; //convert promise to int
+    console.log(`Comparing ${userId} to ${turnIdInt}`);
+
+    if(userId != await turnIdInt){
+        console.log("Not your turn!");
+        response.status(403).send("Not your turn!");
+    }else{
+        //check if player's selected card matches the discard card number or suit
+        const discardIdPromise = Game.getDiscardTop(gameId);
+        const discardIdObject = await discardIdPromise;
+        const discardId = discardIdObject.card_id;
+        console.log(`Comparing ${cardId} and ${discardId}`);
+
+        // Check for same suit (same chunk of 13)
+        const sameSuit = Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
+
+        // Check for same rank (difference of 13)
+        const sameRank = Math.abs(cardId - discardId) === 13;
+        if(sameSuit || sameRank){
+            //move discard card to pile 2
+        //add player's selected card to discard
+        console.log(`Discard successful! ${cardId}`);
+        }else{
+            console.log("Card doesn't match!");
+            response.status(403).send("Card doesn't match!");
+        }
+        
+    }
+
+    
 });
 
 //draw a card

@@ -19,25 +19,27 @@
         <div id="game-area">
             <section id="game-section">
                 <div class="text-center">
+                    <p id="game-id-display"><%= gameId %></p>
                     <% if(isHost) { %>
                     <button id="start-game-button">Start Game</button>
                     <% } %>
-                    <p id="game-id-display"><%= gameId %></p>
-                    <button id="show-hand-button">Show Hand</button>
+                    
                     <button id="announce-presence-button">Announce My Presence</button>
+                    <div id="opponent-card-counts">
+                    </div>
+                    <div id="discard-pile">
+                        </div>
+                    <button id="show-hand-button">Show Hand</button>
+                    <button id="draw-card-button">DRAW CARD</button>
+                    <div id="player-hand-container">
+                        <h2 id="player-hand-title">Your Hand</h2>
+                        <div id="player-hand">
+                            </div>
+                    </div>
                 </div>
             </section>
             <section id="player-info">
-                <div id="opponent-card-counts">
-                    </div>
-                <div id="discard-pile">
-                    </div>
-                <button id="draw-card-button">DRAW CARD</button>
-                <div id="player-hand-container">
-                    <h2 id="player-hand-title">Your Hand</h2>
-                    <div id="player-hand">
-                        </div>
-                </div>
+                
                 <section id="chat-container">
                     <div id="messages"></div>
                     <form>

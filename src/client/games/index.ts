@@ -11,6 +11,7 @@ const gameId = gameIdDisplay ? gameIdDisplay.textContent : null;
 const currentUserId = document.body.dataset.userId;
 const discardPileDiv = document.querySelector('#discard-pile') as HTMLDivElement | null;
 const drawCardButton = document.querySelector("#draw-card-button");
+const discardCard = document.querySelector("#hand-card-button");
 
 const cardMap = {
     1: { value: 'A', suit: 'S', display: 'A♠' },
@@ -155,6 +156,7 @@ async function fetchAndUpdatePlayerHand() {
                     //@ts-ignore
                     const cardInfo = cardMap[card.card_id];
                     const cardElement = document.createElement('div');
+                    cardElement.id = "hand-card-button";
                     cardElement.classList.add('card', cardInfo?.suit.toLowerCase()); //Add suit as a class for styling
                     cardElement.textContent = cardInfo?.display || `ID: ${card.card_id}`;
                     cardElement.addEventListener('click', () => {
@@ -255,14 +257,14 @@ showHandButton?.addEventListener('click', async (event) => {
     event.preventDefault();
     await fetchAndUpdatePlayerHand();
     await fetchAndUpdateOpponentCardCounts();
-    await fetchAndUpdateDiscard(); // Call the new function here
+    await fetchAndUpdateDiscard();
 });
 
 drawCardButton?.addEventListener('click', async (event) => {
     event.preventDefault();
     await fetchAndUpdatePlayerHand();
     await fetchAndUpdateOpponentCardCounts();
-    await fetchAndUpdateDiscard(); // Call the new function here
+    await fetchAndUpdateDiscard();
 });
 
 //Fetch and update opponent card counts, player hand, and discard every 10 seconds

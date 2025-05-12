@@ -38,7 +38,7 @@
     padding: 5px;
     border: 1px solid #ddd;
     background-color: white;
-    min-width: 70px; /* Adjust width for suit/value */
+    width: 70px; /* Adjust width for suit/value */
     text-align: center;
     cursor: pointer; /* Indicate the card is clickable */
     transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
