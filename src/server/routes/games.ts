@@ -94,11 +94,12 @@ router.post("/:gameId/start", async (request: Request, response: Response) => {
 });
 
 //moves selected card from player's hand to player -1 (discard pile)
-router.post("/:gameId/:cardId/discard", async(request: Request, response: Response) =>{
-    const { gameId: paramsGameId} = request.params;
+router.post("/:gameId/:cardId/discard", async (request: Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
 
-    const { cardId: paramsCardId} = request.params;
+    //card that player wants to discard
+    const { cardId: paramsCardId } = request.params;
     const cardId = parseInt(paramsCardId);
 
     //check if it is this player's turn
@@ -110,22 +111,27 @@ router.post("/:gameId/:cardId/discard", async(request: Request, response: Respon
     const turnIdInt = await turnIdPromise; //convert promise to int
     console.log(`Comparing users ${userId} to ${turnIdInt}`);
 
-    if(userId != await turnIdInt){
+    if (userId != await turnIdInt) {
         console.log("Not your turn!");
         response.status(403).send("Not your turn!");
-    }else{
+    } else {
         //check if player's selected card matches the discard card number or suit
         const discardIdPromise = Game.getDiscardTop(gameId);
         const discardIdObject = await discardIdPromise;
         const discardId = discardIdObject.card_id;
         console.log(`Comparing cards ${cardId} and ${discardId}`);
 
+        // Calculate ranks
+        const cardRank = (cardId - 1) % 13;
+        const discardRank = (discardId - 1) % 13;
+
         // Check for same suit (same chunk of 13)
         const sameSuit = Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
 
-        // Check for same rank (difference of 13)
-        const sameRank = Math.abs(cardId - discardId) === 13;
-        if(sameSuit || sameRank){
+        // Check for same rank
+        const sameRank = cardRank === discardRank;
+
+        if (sameSuit || sameRank) {
             console.log(`Card being discarded`);
             //move topdiscard card to pile 2
             await Game.moveDiscard(gameId);
@@ -137,19 +143,18 @@ router.post("/:gameId/:cardId/discard", async(request: Request, response: Respon
             await Game.discardSelectedCard(gameId, cardId);
             console.log(`Discard successful! ${cardId}`);
             response.status(200).send(`Discard successful! ${cardId}`);
-        }else{
+        } else {
             console.log("Card doesn't match!");
             response.status(403).send("Card doesn't match!");
         }
-        
     }
 
-    
+
 });
 
 //draw a card
-router.post("/:gameId/draw", async(request: Request, response: Response) =>{
-    const { gameId: paramsGameId} = request.params;
+router.post("/:gameId/draw", async (request: Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
 
     //check if it is this player's turn
@@ -161,19 +166,80 @@ router.post("/:gameId/draw", async(request: Request, response: Response) =>{
     const turnIdInt = await turnIdPromise; //convert promise to int
     console.log(`Comparing ${userId} to ${turnIdInt}`);
 
-    if(userId != await turnIdInt){
+    if (userId != turnIdInt) {
         console.log("Not your turn!");
         response.status(403).send("Not your turn!");
-    }else{
-        //move card from deck to user's hand
-        try {
-            await Game.drawCard(gameId, userId);//draw hand
-            response.status(200).json();
-        } catch (error) {
-            console.error("Error drawing card:", error);
-            response.status(500).send("Failed to draw card");
+        return;
+    } else {
+        //check if card matches top of discard pile
+        const discardIdPromise = Game.getDiscardTop(gameId);
+        const discardIdObject = await discardIdPromise;
+        const discardId = discardIdObject ? discardIdObject.card_id : null; // Handle empty discard
+
+        //check if player already has a playable card in hand
+        let initialCheck = false;
+        const hand = await Game.getUserHand(gameId, userId);//get player hand
+        for (const card of hand) {
+            const cardId = card.card_id;
+            // Check for same suit (same chunk of 13)
+            const sameSuit = discardId !== null && Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
+
+            // Check for same rank (difference of 13)
+            const sameRank = discardId !== null && Math.abs(cardId % 13) === Math.abs(discardId % 13);
+
+            // Check if the card is an 8
+            const isEight = cardId % 13 === 8; // Assuming card IDs are 1-52, rank 8
+
+            if (sameSuit || sameRank || isEight) {
+                console.log(`Found playable card: ${cardId}`);
+                response.status(200).json({ message: `Got playable card ${cardId}` });
+                initialCheck = true;
+                break; // Exit the inner for...of loop
+            }
         }
-        console.log(`Draw successful! ${userId}`);
+        if (initialCheck) {
+            return;//found a playable card, no reason to draw cards
+        } else {
+            let searchDone = false;
+
+            //keep drawing cards until you find a card that can be played, then plays it
+            while (!searchDone) {
+                try {
+                    await Game.drawCard(gameId, userId);//move card from deck to user's hand
+                    console.log(`Searching hand for cards that can be played`);
+                    const hand = await Game.getUserHand(gameId, userId);
+
+                    for (const card of hand) {
+                        const cardId = card.card_id;
+
+                        // Check for same suit (same chunk of 13)
+                        const sameSuit = discardId !== null && Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
+
+                        // Check for same rank (difference of 13)
+                        const sameRank = discardId !== null && Math.abs(cardId % 13) === Math.abs(discardId % 13);
+
+                        // Check if the card is an 8
+                        const isEight = cardId % 13 === 8; // Assuming card IDs are 1-52, rank 8
+
+                        if (sameSuit || sameRank || isEight) {
+                            console.log(`Found playable card: ${cardId}`);
+                            searchDone = true;
+                            response.status(200).json({ message: `Drew and got playable card ${cardId}` });
+                            break; // Exit the inner for...of loop
+                        }
+                    }
+
+                    if (!searchDone) {
+                        console.log("No playable card found in the current hand, drawing again.");
+                    }
+                } catch (error) {
+                    console.error("Error drawing card:", error);
+                    response.status(500).send("Failed to draw card");
+                    searchDone = true; // Exit the loop on error
+                }
+            }
+        }
+
     }
 });
 
