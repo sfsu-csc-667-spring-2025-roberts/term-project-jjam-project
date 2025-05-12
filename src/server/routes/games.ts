@@ -51,6 +51,8 @@ router.get("/:gameId", async (request: Request, response: Response) => {
     response.render("games", { gameId, isHost: hostId === userId, user });
 });
 
+
+
 router.post("/:gameId/start", async (request: Request, response: Response) => {
     const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
@@ -91,13 +93,66 @@ router.post("/:gameId/start", async (request: Request, response: Response) => {
     response.status(200).send();
 });
 
+//moves selected card from player's hand to player -1 (discard pile)
 router.post("/:gameId/:cardId/discard", async(request: Request, response: Response) =>{
     const { gameId: paramsGameId} = request.params;
     const gameId = parseInt(paramsGameId);
 
     const { cardId: paramsCardId} = request.params;
     const cardId = parseInt(paramsCardId);
+
+    //check if it is this player's turn
+    //@ts-ignore
+    const { id: userId } = request.session.user;
+    console.log(`User who is discarding: ${userId}`);
+
+    //check if player's selected card matches the discard card number or suite
+    //move discard card to pile 2
+    //add player's selected card to discard
     console.log(`Discard successful! ${cardId}`);
+});
+
+//draw a card
+router.post("/:gameId/draw", async(request: Request, response: Response) =>{
+    const { gameId: paramsGameId} = request.params;
+    const gameId = parseInt(paramsGameId);
+
+    //check if it is this player's turn
+    //@ts-ignore
+    const { id: userId } = request.session.user;
+    console.log(`User who is drawing: ${userId}`);
+
+    const turnIdPromise = Game.whoTurn(gameId); //Store the Promise
+    const turnIdInt = await turnIdPromise; //convert promise to int
+    console.log(`Comparing ${userId} to ${turnIdInt}`);
+
+    if(userId != await turnIdInt){
+        console.log("Not your turn!");
+        response.status(403).send();
+    }else{
+        //move card from deck to user's hand
+        try {
+            await Game.drawCard(gameId, userId);//draw hand
+            response.status(200).json();
+        } catch (error) {
+            console.error("Error drawing card:", error);
+            response.status(500).send("Failed to draw card");
+        }
+        console.log(`Draw successful! ${userId}`);
+    }
+});
+
+//get top of discard deck (the card you are supposed to match)
+router.get("/:gameId/discardTop", async (request: Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+    try {
+        const card = await Game.getDiscardTop(gameId);
+        response.status(200).json(card);
+    } catch (error) {
+        console.error("Error fetching top discard card:", error);
+        response.status(500).send("Failed to fetch top discard card");
+    }
 });
 
 router.get("/:gameId/hand", async (request: Request, response: Response) => {

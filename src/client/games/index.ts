@@ -9,6 +9,8 @@ const opponentCardCountsDiv = document.querySelector('#opponent-card-counts') as
 const gameIdDisplay = document.querySelector('#game-id-display');
 const gameId = gameIdDisplay ? gameIdDisplay.textContent : null;
 const currentUserId = document.body.dataset.userId;
+const discardPileDiv = document.querySelector('#discard-pile') as HTMLDivElement | null;
+const drawCardButton = document.querySelector("#draw-card-button");
 
 const cardMap = {
     1: { value: 'A', suit: 'S', display: 'A♠' },
@@ -107,7 +109,33 @@ async function fetchAndUpdateOpponentCardCounts() {
 }
 
 async function fetchAndUpdateDiscard() {
-
+    if (gameId && discardPileDiv) {
+        try {
+            const response = await fetch(`/games/${gameId}/discardTop`);
+            if (!response.ok) {
+                console.error('Failed to fetch discard top:', response.status);
+                discardPileDiv.textContent = 'Discard pile is empty or failed to load.';
+                return;
+            }
+            const discardData = await response.json();
+            discardPileDiv.innerHTML = '<h3>Discard Pile</h3>';
+            if (discardData) {
+                //@ts-ignore
+                const cardInfo = cardMap[discardData.card_id];
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card', cardInfo?.suit.toLowerCase());
+                cardElement.textContent = cardInfo?.display || `ID: ${discardData.card_id}`;
+                discardPileDiv.appendChild(cardElement);
+            } else {
+                const emptyMessage = document.createElement('p');
+                emptyMessage.textContent = 'Empty';
+                discardPileDiv.appendChild(emptyMessage);
+            }
+        } catch (error) {
+            console.error('Error fetching discard top:', error);
+            discardPileDiv.textContent = 'Discard pile is empty or failed to load.';
+        }
+    }
 }
 
 async function fetchAndUpdatePlayerHand() {
@@ -189,6 +217,16 @@ startGameButton?.addEventListener("click", event =>{
     }
 })
 
+drawCardButton?.addEventListener("click", event =>{
+    event.preventDefault();
+    const gameId = getGameId();
+    fetch(`${gameId}/draw`, {
+        method: "post",
+    }).catch((error)=>{
+        console.error("Could not draw card:", error);
+    });
+})
+
 //test retrieve user and game id
 announcePresenceButton?.addEventListener("click", event => {
     event.preventDefault();
@@ -217,13 +255,23 @@ showHandButton?.addEventListener('click', async (event) => {
     event.preventDefault();
     await fetchAndUpdatePlayerHand();
     await fetchAndUpdateOpponentCardCounts();
+    await fetchAndUpdateDiscard(); // Call the new function here
 });
 
-//Fetch and update opponent card counts and player hand every 10 seconds
+drawCardButton?.addEventListener('click', async (event) => {
+    event.preventDefault();
+    await fetchAndUpdatePlayerHand();
+    await fetchAndUpdateOpponentCardCounts();
+    await fetchAndUpdateDiscard(); // Call the new function here
+});
+
+//Fetch and update opponent card counts, player hand, and discard every 10 seconds
 setInterval(async () => {
     await fetchAndUpdateOpponentCardCounts();
     await fetchAndUpdatePlayerHand();
+    await fetchAndUpdateDiscard(); // Call the new function in the interval
 }, 10000);
 
-//Initial fetch of opponent card counts
+//Initial fetch of opponent card counts and discard pile
 fetchAndUpdateOpponentCardCounts();
+fetchAndUpdateDiscard();

@@ -1,7 +1,7 @@
 import { LargeNumberLike } from "crypto";
 import { DBGameUser, GameInfo, PlayerInfo, User } from "../../../../types/global";
 import db from "../connection";
-import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, GET_CARD_SQL, GET_GAME_INFO_SQL, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, IS_HOST_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL } from "./sql";
+import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, GET_CARD_SQL, GET_DISCARDED_CARD_ID_SQL, GET_GAME_INFO_SQL, GET_IS_CURRENT, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, IS_HOST_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL } from "./sql";
 
 // const CREATE_SQL = `INSERT INTO games (name, min_players, max_players, password) VALUES ($1, $2, $3, $4) RETURNING id`;
 // const ADD_PLAYER = `INSERT INTO game_users (game_id, user_id) VALUES ($1, $2)`;
@@ -73,7 +73,7 @@ const start = async (gameId: number) =>{
     for(let i = 0; i < players.length; i++){
         //console.log("player");
         //deal cards to a USER in a GAME with SOME NUMBER OF CARDS into SOME PILE
-        await dealCards(players[i].id, gameId, 0, STOCK_PILE);//may be vestigial, remove later?
+        //await dealCards(players[i].id, gameId, 0, STOCK_PILE);//may be vestigial, remove later?
         await dealCards(players[i].id, gameId, 5, PLAYER_HAND);
     }
     await dealCards(-1, gameId, 1, PLAYER_HAND);//add card to discard pile
@@ -82,9 +82,23 @@ const start = async (gameId: number) =>{
     await setCurrentPlayer(gameId, players[0].id);
 };
 
+const drawCard = async(gameId: number, user_id: number) => {
+    await dealCards(user_id, gameId, 1, PLAYER_HAND);
+};
 
 
-const  getState = async (gameId: number) => {
+const whoTurn = async(gameId: number): Promise<number | null> =>{
+    try {
+        const { user_id } = await db.one<{ user_id: number }>(GET_IS_CURRENT, { gameId });
+        return user_id;
+    } catch (error) {
+        console.error("Error fetching current player:", error);
+        return null;
+    }
+};
+
+
+const getState = async (gameId: number) => {
     //getInfo(),
     const {name} = await getInfo(gameId);
     console.log({name});
@@ -93,18 +107,6 @@ const  getState = async (gameId: number) => {
         id, email, gravatar, seat, isCurrent,
     }));
     console.log({players});
-
-    // const result = {
-    //     name,
-    //     buildPiles: await Promise.all([NORTH_PILE, EAST_PILE, SOUTH_PILE, WEST_PILE].map((pile) =>{
-    //         return db.one(GET_CARD_SQL, {gameId, pile, userId: 0, limit: 1});
-    //     })),
-    //     players: {}
-    //     // players: players.reduce((acc, player) => {
-    //     //     acc[player.id] = player;
-    //     //     return acc;
-    //     // }, {} as Record<number, PlayerInfo>),
-    // };
 
     const playerInfo: Record<number, PlayerInfo> = {};
     for(let i = 0; i < players.length; i++){
@@ -122,11 +124,6 @@ const  getState = async (gameId: number) => {
         }catch(error){
             console.error({error});
         }
-
-
-        // const hand = await;
-        // const stockPileTop
-        //result.players[id] = players[i];
     }
 
     return {
@@ -135,50 +132,19 @@ const  getState = async (gameId: number) => {
             return db.one(GET_CARD_SQL, {gameId, pile, userId: 0, limit: 1});
         })),
         players: playerInfo,
-        // players: players.reduce((acc, player) => {
-        //     acc[player.id] = player;
-        //     return acc;
-        // }, {} as Record<number, PlayerInfo>),
     };
 
-
-    // const result = {
-    //     name,
-    //     //playerIds: players.map(({id}) => id),
-    //     players: players.reduce((acc, player) => {
-    //         acc[player.id] = player;
-
-    //         return acc;
-    //     }, {} as Record<number, any>
-    // ),
-    // }
-    //Need to get
-    //build piles (N,E,S,W) (top card)
-    //stock pile top card for each player
-    //discard piles for each player
-    //hand for each player
-
-    //handPerPlayer(),
-    /*
-    export const STOCK_PILE = 0;
-    export const PLAYER_HAND = 1;
-    export const DISCARD_1 = 2;
-    export const DISCARD_2 = 3;
-    export const DISCARD_3 = 4;
-    export const DISCARD_4 = 5;
-
-    export const NORTH_PILE = 1;
-    export const EAST_PILE = 2;
-    export const SOUTH_PILE = 3;
-    export const WEST_PILE = 4;
-    */
 };
 
 const getUserHand = async (gameId: number, userId: number) => {
     return await db.manyOrNone(GET_PLAYER_HAND_SQL, { gameId, userId, pile: PLAYER_HAND});
 };
 
-export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, getPlayersWithHandCount, cardLocations: {
+const getDiscardTop = async(gameId: number) =>{
+    return await db.one(GET_PLAYER_HAND_SQL, {gameId, pile: 1, userId: -1, limit: 1});
+}
+
+export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, getPlayersWithHandCount, getDiscardTop, drawCard, whoTurn, cardLocations: {
     STOCK_PILE: STOCK_PILE,
     PLAYER_HAND: PLAYER_HAND,
     DISCARD_1: DISCARD_1,

@@ -18,6 +18,9 @@
     border: 1px solid #ccc;
     padding: 10px;
     background-color: #f9f9f9;
+    width: 300px; /* Adjust width as needed */
+    display: flex;
+    flex-direction: column;
 }
 
 #player-hand-title {
