@@ -167,25 +167,54 @@ async function fetchAndUpdatePlayerHand() {
                                 "Content-Type": "application/json",
                             },
                         })
-                        .then(response => {
-                            if (response.ok) {
-                                console.log(`Successfully discarded card ID: ${card.card_id}`);
-                                //Remove the card element from the DOM
-                                cardElement.remove();
-                                //update cards on screen
-                                fetchAndUpdateDiscard();
-                                fetchAndUpdateOpponentCardCounts();
-                            } else if (response.status === 403) {
-                                response.text().then(message => {
-                                    console.log(`Discard failed: ${message}`);
-                                });
-                            } else {
-                                console.error("Error discarding card:", response.status);
-                            }
-                        })
-                        .catch((error)=>{
-                            console.error("Error discarding card:", error);
-                        });
+                            .then(async response => {
+                                if (response.ok) {
+                                    console.log(`Successfully discarded card ID: ${card.card_id}`);
+                                    //Remove the card element from the DOM
+                                    cardElement.remove();
+                                    //update cards on screen
+                                    fetchAndUpdateDiscard();
+                                    fetchAndUpdateOpponentCardCounts();
+                                    console.log(`Turn Complete!`);
+
+                                    //get current turn player's name
+                                    try {
+                                        const currNameResponse = await fetch(`/games/${gameId}/getCurrName`);
+                                        if (currNameResponse.ok) {
+                                            const currentPlayerName = await currNameResponse.text(); // Assuming server sends plain text
+                                            console.log(`Current Player's Turn: ${currentPlayerName}`);
+
+                                            //Send a chat message that it is now the next player's turn
+                                            fetch(`/chat/${gameId}`, {
+                                                method: "post",
+                                                headers: {
+                                                    "Content-Type": "application/json",
+                                                },
+                                                body: JSON.stringify({
+                                                    message: `It is now ${currentPlayerName}'s turn!`,
+                                                    senderId: 0, //ID 0 is the system
+                                                }),
+                                            }).catch((error) => {
+                                                console.error("Error sending turn message:", error);
+                                            });
+                                        } else {
+                                            console.error("Failed to fetch current player name:", currNameResponse.status);
+                                        }
+                                    } catch (error) {
+                                        console.error("Error fetching current player name:", error);
+                                    }
+
+                                } else if (response.status === 403) {
+                                    response.text().then(message => {
+                                        console.log(`Discard failed: ${message}`);
+                                    });
+                                } else {
+                                    console.error("Error discarding card:", response.status);
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Error discarding card:", error);
+                            });
                     });
                     playerHandDiv.appendChild(cardElement);
                 });
@@ -207,7 +236,7 @@ async function fetchAndUpdatePlayerHand() {
 
 
 
-startGameButton?.addEventListener("click", event =>{
+startGameButton?.addEventListener("click", event => {
     event.preventDefault();
     const gameId = getGameId();
     console.log(`games/${gameId}/start`);
@@ -225,7 +254,7 @@ startGameButton?.addEventListener("click", event =>{
             message: "The game has started!",
             senderId: 0, //ID 0 is the system
         }),
-    }).catch((error)=>{
+    }).catch((error) => {
         console.error("Error sending game started message:", error);
     });
 
@@ -235,29 +264,29 @@ startGameButton?.addEventListener("click", event =>{
     }
 })
 
-drawCardButton?.addEventListener("click", event =>{
+drawCardButton?.addEventListener("click", event => {
     event.preventDefault();
     const gameId = getGameId();
     fetch(`${gameId}/draw`, {
         method: "post",
     })
-    .then(response => {
-        if (response.ok) {
-            console.log("Card drawn successfully. Updating UI.");
-            fetchAndUpdatePlayerHand();
-            fetchAndUpdateOpponentCardCounts();
-            fetchAndUpdateDiscard();
-        } else if (response.status === 403) {
-            response.text().then(message => {
-                console.log(`Draw failed: ${message}`);
-            });
-        } else {
-            console.error("Failed to draw card:", response.status);
-        }
-    })
-    .catch((error)=>{
-        console.error("Could not draw card:", error);
-    });
+        .then(response => {
+            if (response.ok) {
+                console.log("Card drawn successfully. Updating UI.");
+                fetchAndUpdatePlayerHand();
+                fetchAndUpdateOpponentCardCounts();
+                fetchAndUpdateDiscard();
+            } else if (response.status === 403) {
+                response.text().then(message => {
+                    console.log(`Draw failed: ${message}`);
+                });
+            } else {
+                console.error("Failed to draw card:", response.status);
+            }
+        })
+        .catch((error) => {
+            console.error("Could not draw card:", error);
+        });
 });
 
 //test retrieve user and game id

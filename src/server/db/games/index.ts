@@ -1,7 +1,7 @@
 import { LargeNumberLike } from "crypto";
 import { DBGameUser, GameInfo, PlayerInfo, User } from "../../../../types/global";
 import db from "../connection";
-import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, DISCARD_CARD_SQL, GET_CARD_SQL, GET_DISCARDED_CARD_ID_SQL, GET_GAME_INFO_SQL, GET_IS_CURRENT, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, IS_DECK_EMPTY_SQL, IS_HOST_SQL, MOVE_DISCARD_CARD_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL, SHUFFLE_DISCARD_SQL } from "./sql";
+import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CONVERT_ID_TO_SEAT, CREATE_SQL, DEAL_CARDS_SQL, DISCARD_CARD_SQL, FLIP_IS_CURRENT, GET_CARD_SQL, GET_DISCARDED_CARD_ID_SQL, GET_GAME_INFO_SQL, GET_IS_CURRENT, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYER_NAME_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, HIGHEST_SEAT_SQL, IS_DECK_EMPTY_SQL, IS_HOST_SQL, LOWEST_SEAT_SQL, MOVE_DISCARD_CARD_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL, SHUFFLE_DISCARD_SQL } from "./sql";
 
 // const CREATE_SQL = `INSERT INTO games (name, min_players, max_players, password) VALUES ($1, $2, $3, $4) RETURNING id`;
 // const ADD_PLAYER = `INSERT INTO game_users (game_id, user_id) VALUES ($1, $2)`;
@@ -61,7 +61,6 @@ export const EAST_PILE = 2;
 export const SOUTH_PILE = 3;
 export const WEST_PILE = 4;
 
-
 const start = async (gameId: number) =>{
     //add cards to game
     await db.none(SETUP_DECK_SQL, {gameId });
@@ -87,13 +86,13 @@ const drawCard = async(gameId: number, user_id: number) => {
 };
 
 
-const whoTurn = async(gameId: number): Promise<number | null> =>{
+const whoTurn = async(gameId: number) =>{
     try {
         const { user_id } = await db.one<{ user_id: number }>(GET_IS_CURRENT, { gameId });
         return user_id;
     } catch (error) {
         console.error("Error fetching current player:", error);
-        return null;
+        return 0;
     }
 };
 
@@ -158,11 +157,11 @@ const getUserHand = async (gameId: number, userId: number) => {
     return await db.manyOrNone(GET_PLAYER_HAND_SQL, { gameId, userId, pile: PLAYER_HAND});
 };
 
-const getDiscardTop = async(gameId: number) =>{
+const getDiscardTop = async(gameId: number) => {
     return await db.one(GET_PLAYER_HAND_SQL, {gameId, pile: 1, userId: -1, limit: 1});
 }
 
-const isDeckEmpty = async(gameId: number) =>{
+const isDeckEmpty = async(gameId: number) => {
     return await db.one(IS_DECK_EMPTY_SQL, {gameId});
 }
 
@@ -170,7 +169,31 @@ const shuffleDiscard = async(gameId: number) => {
     return await db.none(SHUFFLE_DISCARD_SQL, {gameId});
 }
 
-export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, getPlayersWithHandCount, getDiscardTop, drawCard, whoTurn, moveDiscard, discardSelectedCard, isDeckEmpty, shuffleDiscard, cardLocations: {
+const getHighestSeat = async(gameId: number) => {
+    return await db.one(HIGHEST_SEAT_SQL, {gameId});
+}
+
+const getLowestSeat = async(gameId: number) => {
+    return await db.one(LOWEST_SEAT_SQL, {gameId});
+}
+
+const getSeat = async(gameId: number, userId: number) => {
+    return await db.one(CONVERT_ID_TO_SEAT, {gameId, userId});
+}
+
+const isCurrentFlip = async(gameId: number, seat: number) => {
+    return await db.none(FLIP_IS_CURRENT, {gameId, seat});
+}
+
+const getPlayerName = async(id: number) => {
+    return await db.one(GET_PLAYER_NAME_SQL, {id});
+}
+
+export default { 
+    create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, 
+    getPlayersWithHandCount, getDiscardTop, drawCard, whoTurn, moveDiscard, discardSelectedCard, isDeckEmpty, shuffleDiscard, 
+    getHighestSeat, getLowestSeat, getSeat, isCurrentFlip, getPlayerName,
+    cardLocations: {
     STOCK_PILE: STOCK_PILE,
     PLAYER_HAND: PLAYER_HAND,
     DISCARD_1: DISCARD_1,

@@ -52,7 +52,6 @@ router.get("/:gameId", async (request: Request, response: Response) => {
 });
 
 
-
 router.post("/:gameId/start", async (request: Request, response: Response) => {
     const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
@@ -146,10 +145,37 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
             console.log(`Discarding ${gameId}, ${cardId}, ${fromUserId}`);
             await Game.discardSelectedCard(gameId, cardId);
             console.log(`Discard successful! ${cardId}`);
+
             response.status(200).send(`Discard successful! ${cardId}`);
             
             //next player's turn
 
+            //see if we are at the seat with the highest value
+            const highestSeatPromise = await Game.getHighestSeat(gameId);
+            const highestSeatInt = highestSeatPromise.highest_seat;
+            console.log(highestSeatInt);
+
+            //get current player's seat number
+            const currSeatPromise = await Game.getSeat(gameId, turnIdInt);
+            const currSeatVal = currSeatPromise.curr_seat;
+
+            console.log(`comparing ${currSeatVal} and ${highestSeatInt}`);
+            if(currSeatVal == highestSeatInt){
+                //if we are at top seat in game turn order
+                console.log("reset turn order!");
+                const lowestSeatPromise = await Game.getLowestSeat(gameId);
+                const lowestSeatInt = lowestSeatPromise.lowest_seat;
+                console.log(lowestSeatInt);
+                Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
+                Game.isCurrentFlip(gameId, lowestSeatInt);//set is_current from false to true on player with lowest seat number this game
+                //response.status(200).send("Turn complete!");
+            }else{
+                console.log("TURN OVER");
+                //console.log(currSeatVal+1);
+                Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
+                Game.isCurrentFlip(gameId, currSeatVal+1);//set is_current from false to true on next player
+                //response.status(200).send("Turn complete!");
+            }
 
         } else {
             console.log("Card doesn't match!");
@@ -297,5 +323,23 @@ router.get("/:gameId/players", async (request: Request, response: Response) => {
         response.status(500).send("Failed to fetch player information");
     }
 });
+
+//get current turn player name
+router.get("/:gameId/getCurrName", async (request: Request, response: Response) => {
+    console.log("Getting player name");
+    const { gameId: paramsGameId } = request.params; 
+    const gameId = parseInt(paramsGameId);
+    try {
+        const playerId = await Game.whoTurn(gameId);
+        console.log(`Current player's turn: ${playerId}`);
+        const player = await Game.getPlayerName(playerId);
+        console.log(`Player turn name ${player.player}`);
+        response.status(200).json(player.player);
+    } catch (error) {
+        console.error("Error fetching current player name:", error);
+        response.status(500).send("Failed to fetch current player name");
+    }
+});
+
 
 export default router;

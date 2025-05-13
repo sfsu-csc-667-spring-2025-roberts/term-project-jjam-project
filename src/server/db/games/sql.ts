@@ -140,9 +140,48 @@ export const SHUFFLE_DISCARD_SQL = `
     SET
         user_id = 0,
         pile = 1,
-        card_order = random()
+        card_order = FLOOR(random() * 10000)
     WHERE
         game_id = $(gameId)
         AND user_id = -1 
         AND pile = 2
+`;
+
+export const HIGHEST_SEAT_SQL = `
+    SELECT MAX(seat) AS highest_seat
+    FROM game_users
+    WHERE game_id = $(gameId)
+`;
+
+export const LOWEST_SEAT_SQL = `
+    SELECT MIN(seat) AS lowest_seat
+    FROM game_users
+    WHERE game_id = $(gameId)
+`;
+
+export const CONVERT_ID_TO_SEAT = `
+SELECT seat AS curr_seat
+FROM game_users
+WHERE
+    game_id = $(gameId)
+    AND user_id = $(userId)
+`;
+
+export const FLIP_IS_CURRENT = `
+UPDATE game_users
+SET
+    is_current = CASE
+        WHEN is_current = TRUE THEN FALSE
+        ELSE TRUE
+    END
+WHERE
+    game_id = $(gameId)
+    AND seat = $(seat)
+`;
+
+export const GET_PLAYER_NAME_SQL = ` 
+SELECT email AS player
+FROM users
+WHERE
+    id = $(id)
 `;
