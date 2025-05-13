@@ -120,3 +120,29 @@ FROM game_users
 WHERE game_id=$(gameId)
 AND is_current=true;
 `;
+
+export const IS_DECK_EMPTY_SQL = `
+SELECT
+    CASE
+        WHEN EXISTS (
+            SELECT 1
+            FROM game_cards
+            WHERE user_id = 0
+            AND game_id=$(gameId)
+        )
+        THEN 'false'
+        ELSE 'true' --return true if the deck is empty
+    END AS contains_card_with_userid_0;
+`;
+
+export const SHUFFLE_DISCARD_SQL = `
+    UPDATE game_cards
+    SET
+        user_id = 0,
+        pile = 1,
+        card_order = random()
+    WHERE
+        game_id = $(gameId)
+        AND user_id = -1 
+        AND pile = 2
+`;

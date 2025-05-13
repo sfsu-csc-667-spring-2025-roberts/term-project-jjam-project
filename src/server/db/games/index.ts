@@ -1,7 +1,7 @@
 import { LargeNumberLike } from "crypto";
 import { DBGameUser, GameInfo, PlayerInfo, User } from "../../../../types/global";
 import db from "../connection";
-import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, DISCARD_CARD_SQL, GET_CARD_SQL, GET_DISCARDED_CARD_ID_SQL, GET_GAME_INFO_SQL, GET_IS_CURRENT, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, IS_HOST_SQL, MOVE_DISCARD_CARD_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL } from "./sql";
+import { ADD_PLAYER, CONDITIONALLY_JOIN_SQL, CREATE_SQL, DEAL_CARDS_SQL, DISCARD_CARD_SQL, GET_CARD_SQL, GET_DISCARDED_CARD_ID_SQL, GET_GAME_INFO_SQL, GET_IS_CURRENT, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, IS_DECK_EMPTY_SQL, IS_HOST_SQL, MOVE_DISCARD_CARD_SQL, SET_IS_CURRENT_SQL, SETUP_DECK_SQL, SHUFFLE_DISCARD_SQL } from "./sql";
 
 // const CREATE_SQL = `INSERT INTO games (name, min_players, max_players, password) VALUES ($1, $2, $3, $4) RETURNING id`;
 // const ADD_PLAYER = `INSERT INTO game_users (game_id, user_id) VALUES ($1, $2)`;
@@ -162,7 +162,15 @@ const getDiscardTop = async(gameId: number) =>{
     return await db.one(GET_PLAYER_HAND_SQL, {gameId, pile: 1, userId: -1, limit: 1});
 }
 
-export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, getPlayersWithHandCount, getDiscardTop, drawCard, whoTurn, moveDiscard, discardSelectedCard, cardLocations: {
+const isDeckEmpty = async(gameId: number) =>{
+    return await db.one(IS_DECK_EMPTY_SQL, {gameId});
+}
+
+const shuffleDiscard = async(gameId: number) => {
+    return await db.none(SHUFFLE_DISCARD_SQL, {gameId});
+}
+
+export default { create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand, getPlayersWithHandCount, getDiscardTop, drawCard, whoTurn, moveDiscard, discardSelectedCard, isDeckEmpty, shuffleDiscard, cardLocations: {
     STOCK_PILE: STOCK_PILE,
     PLAYER_HAND: PLAYER_HAND,
     DISCARD_1: DISCARD_1,

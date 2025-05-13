@@ -136,6 +136,7 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
 
         if (sameSuit || sameRank || isEight) {
             console.log(`Card being discarded`);
+
             //move topdiscard card to pile 2
             await Game.moveDiscard(gameId);
 
@@ -146,6 +147,10 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
             await Game.discardSelectedCard(gameId, cardId);
             console.log(`Discard successful! ${cardId}`);
             response.status(200).send(`Discard successful! ${cardId}`);
+            
+            //next player's turn
+
+
         } else {
             console.log("Card doesn't match!");
             response.status(403).send("Card doesn't match!");
@@ -228,12 +233,17 @@ router.post("/:gameId/draw", async (request: Request, response: Response) => {
                             console.log(`Found playable card: ${cardId}`);
                             searchDone = true;
                             response.status(200).json({ message: `Drew and got playable card ${cardId}` });
-                            break; // Exit the inner for...of loop
+                            break;
                         }
                     }
 
                     if (!searchDone) {
                         console.log("No playable card found in the current hand, drawing again.");
+                        const deckCheck = await Game.isDeckEmpty(gameId);
+                        if(deckCheck){
+                            console.log("Deck Empty! Shuffling discard pile!");
+                            Game.shuffleDiscard(gameId);
+                        }
                     }
                 } catch (error) {
                     console.error("Error drawing card:", error);
