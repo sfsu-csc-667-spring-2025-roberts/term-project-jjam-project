@@ -667,9 +667,44 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"9YDZd":[function(require,module,exports,__globalThis) {
-//console.log("Hello from the client (chat)");
-var _sockets = require("../sockets");
-const roomId = document.querySelector("#room-id")?.value;
+// Modern real-time chat client for lobby using Socket.IO
+const socket = window.io ? window.io() : null;
+
+function renderChat(messages) {
+    const messagesDiv = document.getElementById('messages');
+    if (!messagesDiv) return;
+    messagesDiv.innerHTML = '';
+    messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'chat-message' + (msg.userId === window.userId ? ' self' : '');
+        div.innerHTML = `
+            <img class="avatar" src="https://gravatar.com/avatar/${msg.gravatar || ''}?s=36&d=identicon" alt="avatar" />
+            <div class="msg-content">
+                <span class="username">${msg.username || msg.user || 'User'}</span>
+                <span class="timestamp">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : ''}</span><br/>
+                ${msg.message}
+            </div>
+        `;
+        messagesDiv.appendChild(div);
+    });
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Listen for chat events
+if (socket && window.lobbyId) {
+    socket.on('chatMessage', data => {
+        if (data.lobbyId === window.lobbyId) {
+            renderChat(data.chat);
+        }
+    });
+    // Optionally listen for lobbyState for initial chat
+    socket.on('lobbyState', data => {
+        if (data.lobbyId === window.lobbyId) {
+            renderChat(data.lobby.chat || []);
+        }
+    });
+}
+
 const chatContainer = document.querySelector("#chat-container div");
 (0, _sockets.socket).on("chat:message:0", ({ message, sender, timestamp })=>{
     //do something with this

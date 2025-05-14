@@ -1,0 +1,1 @@
+This placeholder file allows the creation of the /api directory for routing. Delete after adding real route files.

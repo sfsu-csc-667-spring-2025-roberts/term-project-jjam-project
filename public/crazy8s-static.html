@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/includes/variables.css">
   <link rel="stylesheet" href="/css/includes/create-game-form.css">
+  <!-- Accessibility & Semantic Improvements by Cascade AI -->
   <style>
     body {
       background: #1a1a1a;
@@ -144,11 +145,14 @@
   </style>
 </head>
 <body>
-  <div class="crazy8s-layout">
-    <!-- Players Sidebar -->
-    <aside class="players-sidebar">
+  <!-- Main application landmark -->
+  <div class="crazy8s-layout" role="main">
+    <!-- Players Sidebar (dynamic placeholder) -->
+    <aside class="players-sidebar" aria-label="Players List">
       <h2>Players</h2>
-      <ul>
+      <!-- DYNAMIC: Inject player list here -->
+      <ul id="player-list">
+        <!-- Example static entries below. Replace with dynamic rendering. -->
         <li class="player-entry active">
           <img src="https://gravatar.com/avatar/1?s=32&d=identicon" alt="Avatar" class="avatar"> You <span class="cards-left">6 cards</span> <span class="turn-indicator">&larr; Your turn</span>
         </li>
@@ -166,34 +170,53 @@
     <!-- Main Board -->
     <main class="crazy8s-board">
       <div class="game-title">Crazy-8s</div>
-      <div class="table">
+      <!-- DYNAMIC: Table area for draw/discard piles -->
+      <div class="table" aria-label="Game Table">
         <div class="table-row">
-          <div class="deck" title="Draw pile">🂠</div>
-          <div class="discard" title="Top of discard pile">
+          <div class="deck" title="Draw pile" tabindex="0" aria-label="Draw pile">🂠</div>
+          <img src="/assets/card-back.png" class="card" style="margin-right: 12px;" alt="Card back">
+          <div class="discard" title="Top of discard pile" tabindex="0" aria-label="Top of discard pile">
+            <img src="/assets/card-back.png" class="card" alt="Card back">
             <span class="card suit-hearts">8♥</span>
           </div>
         </div>
       </div>
       <div class="hand-label">Your Hand</div>
-      <div class="hand">
-        <div class="card suit-hearts">A♥</div>
-        <div class="card suit-diamonds">8♦</div>
-        <div class="card suit-clubs">K♣</div>
-        <div class="card suit-spades">2♠</div>
-        <div class="card suit-hearts">5♥</div>
-        <div class="card suit-diamonds">Q♦</div>
+      <!-- DYNAMIC: Player hand area -->
+      <div class="hand" id="player-hand" aria-label="Your Hand">
+        <!-- Example static cards. Replace with dynamic rendering. -->
+        <div class="card suit-hearts" tabindex="0" aria-label="Ace of Hearts">A♥</div>
+        <div class="card suit-diamonds" tabindex="0" aria-label="Eight of Diamonds">8♦</div>
+        <div class="card suit-clubs" tabindex="0" aria-label="King of Clubs">K♣</div>
+        <div class="card suit-spades" tabindex="0" aria-label="Two of Spades">2♠</div>
+        <div class="card suit-hearts" tabindex="0" aria-label="Five of Hearts">5♥</div>
+        <div class="card suit-diamonds" tabindex="0" aria-label="Queen of Diamonds">Q♦</div>
       </div>
-      <div class="actions">
-        <button class="action-btn">Play Card</button>
-        <button class="action-btn">Draw Card</button>
-        <button class="action-btn">Pass</button>
+      <!-- DYNAMIC: Action buttons area -->
+      <div class="actions" aria-label="Game Actions">
+        <button class="action-btn" id="play-card-btn">Play Card</button>
+        <button class="action-btn" id="draw-card-btn">Draw Card</button>
+        <button class="action-btn" id="pass-btn">Pass</button>
       </div>
       <!-- In-game Chat Box (static demo) -->
-      <section class="game-chat">
+      <section class="game-chat" aria-label="Game Chat">
         <div class="chat-header">Game Chat</div>
-        <div class="chat-messages">
-          <div class="chat-message"><span class="chat-avatar"><img src="https://gravatar.com/avatar/2?s=20&d=identicon"></span><span class="chat-user">Player 2:</span> Good luck!</div>
-          <div class="chat-message self"><span class="chat-avatar"><img src="https://gravatar.com/avatar/1?s=20&d=identicon"></span><span class="chat-user">You:</span> Let's go!</div>
+        <!-- DYNAMIC: Chat messages -->
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-message"><span class="chat-avatar"><img src="https://gravatar.com/avatar/2?s=20&d=identicon" alt="Avatar"></span><span class="chat-user">Player 2:</span> Good luck!</div>
+          <div class="chat-message self"><span class="chat-avatar"><img src="https://gravatar.com/avatar/1?s=20&d=identicon" alt="Avatar"></span><span class="chat-user">You:</span> Let's go!</div>
+        </div>
+        <!-- DYNAMIC: Chat input -->
+        <form class="chat-input" aria-label="Send chat message" onsubmit="return false;">
+          <label for="chat-message-input" class="visually-hidden">Type your message</label>
+          <input id="chat-message-input" type="text" placeholder="Type your message..." aria-label="Type your message" autocomplete="off">
+          <button type="submit" class="action-btn">Send</button>
+        </form>
+      </section>
+    </main>
+  </div>
+  <!-- End of crazy8s-layout -->
+  <script src="/crazy8s.js"></script>
         </div>
         <form class="chat-form" onsubmit="event.preventDefault();">
           <input type="text" placeholder="Type a message..." disabled>

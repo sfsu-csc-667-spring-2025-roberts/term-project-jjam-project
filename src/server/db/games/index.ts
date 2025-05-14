@@ -67,7 +67,24 @@ export function getGames(): GameState[] {
 }
 
 export function getGame(id: string): GameState | undefined {
-    return getGames().find(g => g.id === id);
+    const game = getGames().find(g => g.id === id);
+    if (game && !Array.isArray(game.chat)) game.chat = [];
+    return game;
+}
+
+export function getChat(gameId: string) {
+    const game = getGame(gameId);
+    return game ? (game.chat || []) : [];
+}
+
+export function addChatMessage(gameId: string, user: string, message: string) {
+    const game = getGame(gameId);
+    if (!game) return false;
+    if (!Array.isArray(game.chat)) game.chat = [];
+    const chatMsg = { user, message, time: Date.now() };
+    game.chat.push(chatMsg);
+    saveGame(game);
+    return chatMsg;
 }
 
 export function saveGame(game: GameState) {

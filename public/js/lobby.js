@@ -28,6 +28,60 @@ document.addEventListener('DOMContentLoaded', function () {
         el.style.color = type === 'success' ? '#075e07' : '#a80000';
     }
 
+    // --- SOCKET.IO INTEGRATION ---
+    const socket = window.io ? window.io() : null;
+    
+    function renderLobbyList(lobbies) {
+        const list = document.getElementById('game-listing');
+        list.innerHTML = '';
+        lobbies.forEach(lobby => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <b>${lobby.name}</b> (${lobby.players} players)
+                <button data-id="${lobby.id}" data-name="${lobby.name}" class="join-btn">Join</button>
+                <button data-id="${lobby.id}" class="leave-btn">Leave</button>
+                <button data-id="${lobby.id}" class="copy-link-btn">Copy Invite Link</button>
+                <div class="player-list"></div>
+            `;
+            list.appendChild(div);
+            const playerDiv = div.querySelector('.player-list');
+            if (lobby.players_list && lobby.players_list.length) {
+                lobby.players_list.forEach(player => {
+                    const avatar = document.createElement('img');
+                    avatar.className = 'player-avatar';
+                    avatar.src = `https://gravatar.com/avatar/${player.gravatar || ''}?s=32&d=identicon`;
+                    avatar.alt = player.id || player;
+                    avatar.title = player.id || player;
+                    playerDiv.appendChild(avatar);
+                });
+            } else {
+                playerDiv.textContent = '';
+            }
+        });
+        // Button event handlers (join, leave, copy) as before...
+    }
+
+    function renderChat(messages) {
+        const messagesDiv = document.getElementById('messages');
+        messagesDiv.innerHTML = '';
+        messages.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = 'chat-message' + (msg.userId === window.userId ? ' self' : '');
+            div.innerHTML = `
+                <img class="avatar" src="https://gravatar.com/avatar/${msg.gravatar || ''}?s=36&d=identicon" alt="avatar" />
+                <div class="msg-content">
+                    <span class="username">${msg.username || msg.user || 'User'}</span>
+                    <span class="timestamp">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : ''}</span><br/>
+                    ${msg.message}
+                </div>
+            `;
+            messagesDiv.appendChild(div);
+        });
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // --- END SOCKET.IO INTEGRATION ---
+
     function fetchLobbies() {
         fetch('/lobby/list')
             .then(res => res.json())
@@ -143,39 +197,74 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function pollChat() {
-        const lobbyId = window.lobbyId;
-        if (!lobbyId) return;
-        fetch('/lobby/list')
-            .then(res => res.json())
-            .then(lobbies => {
-                const lobby = lobbies.find(l => l.id === lobbyId);
-                if (!lobby) return;
-                const messages = document.getElementById('messages');
-                messages.innerHTML = '';
-                (lobby.chat || []).forEach(msg => {
-                    const div = document.createElement('div');
-                    div.textContent = `${msg.user}: ${msg.message}`;
-                    messages.appendChild(div);
-                });
-            });
-        setTimeout(pollChat, 2000);
-    }
+    // --- REMOVE POLLING, USE SOCKET.IO EVENTS ---
+    // pollChat removed
+    
 
     document.getElementById('chat-container')?.addEventListener('submit', function (e) {
         e.preventDefault();
         const input = document.getElementById('message');
-        const message = input.value;
-        const lobbyId = window.lobbyId;
-        fetch('/lobby/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ lobbyId, message })
-        }).then(() => { input.value = ''; });
+        const message = input.value.trim();
+        if (!message) return;
+        if (socket && window.lobbyId && window.userId) {
+            socket.emit('chatMessage', {
+                lobbyId: window.lobbyId,
+                userId: window.userId,
+                message: message
+            });
+        }
+        input.value = '';
     });
 
     // Init
     fetchLobbies();
     setupCreateLobby();
-    pollChat();
+
+    // --- Add AI Opponent Button ---
+    const addAIButton = document.getElementById('add-ai-btn');
+    if (addAIButton && socket) {
+        addAIButton.onclick = function() {
+            if (window.lobbyId) {
+                socket.emit('addAI', { lobbyId: window.lobbyId });
+                showMessage('Adding AI opponent...', 'success');
+            }
+        };
+    }
+
+    // --- SOCKET.IO EVENT HANDLERS ---
+    if (socket) {
+        // Join lobby room for real-time updates
+        if (window.lobbyId && window.userId) {
+            socket.emit('joinLobby', { lobbyId: window.lobbyId, userId: window.userId });
+        }
+        socket.on('lobbyUpdate', lobbies => {
+            renderLobbyList(lobbies);
+        });
+        socket.on('chatMessage', data => {
+            if (data.lobbyId === window.lobbyId) {
+                renderChat(data.chat);
+            }
+        });
+        socket.on('playerJoined', data => {
+            if (data.lobbyId === window.lobbyId) {
+                showMessage(`${data.username || 'A user'} joined the lobby.`, 'success');
+            }
+        });
+        socket.on('playerLeft', data => {
+            if (data.lobbyId === window.lobbyId) {
+                showMessage(`${data.username || 'A user'} left the lobby.`, 'error');
+            }
+        });
+        // Request initial lobby and chat state
+        if (window.lobbyId) {
+            socket.emit('getLobbyState', { lobbyId: window.lobbyId });
+            socket.on('lobbyState', data => {
+                if (data.lobbyId === window.lobbyId) {
+                    renderLobbyList([data.lobby]);
+                    renderChat(data.lobby.chat || []);
+                }
+            });
+        }
+    }
 });
+

@@ -4,35 +4,34 @@ import { Request, Response } from "express";
 
 const router = express.Router();
 
-// /chat/*
-router.post("/:roomId", (request: Request, response: Response) => {
-    const { roomId } = request.params;
-    const { message } = request.body;
-    //@ts-ignore
-    const { id, email, gravatar } = request.session.user;
-    const io = request.app.get("io");
+import { getChat, addChatMessage } from "../db/games";
 
-    if(!io){
-        response.status(500).send("Socket.io not initialized");
+// GET /chat/:gameId - fetch chat history
+router.get("/:gameId", (req: Request, res: Response) => {
+    const { gameId } = req.params;
+    const chat = getChat(gameId);
+    res.json({ chat });
+});
+
+// POST /chat/:gameId - add new message
+router.post("/:gameId", (req: Request, res: Response) => {
+    const { gameId } = req.params;
+    const { message } = req.body;
+    // Fallback user if not logged in
+    let user = "anonymous";
+    if (req.session && req.session.user && req.session.user.id) {
+        user = req.session.user.id;
+    }
+    if (!message) {
+        res.status(400).send("Message is required");
         return;
     }
-
-    if (!message){
-        response.status(400).send("Message is required");
-        return;
+    const chatMsg = addChatMessage(gameId, user, message);
+    const io = req.app.get("io");
+    if (io) {
+        io.to(`game_${gameId}`).emit("chatMessage", chatMsg);
     }
-
-    io.emit(`chat:message:${roomId}`, {
-        message,
-        sender: {
-            id,
-            email,
-            gravatar,
-        },
-        timestamp: new Date(),
-    });
-
-    response.status(200).send();
+    res.status(200).json({ success: true, chatMsg });
 });
 
 export default router;

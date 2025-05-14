@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto-Format AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Auto-Format AI</h1>
+      <button id="mode-toggle" title="Toggle dark/light mode">🌓</button>
+    </header>
+    <main>
+      <section id="input-section">
+        <textarea id="input-text" placeholder="Paste or type your text here..." rows="6"></textarea>
+        <div id="file-drop">Drag & drop a text file here</div>
+        <div id="controls">
+          <label>Formality <input type="range" min="0" max="2" value="1" id="formality-slider"></label>
+          <label>Length <input type="range" min="0" max="2" value="1" id="length-slider"></label>
+          <label><input type="checkbox" id="tone-toggle" checked> Preserve Tone</label>
+        </div>
+        <button id="format-btn">Format</button>
+      </section>
+      <section id="comparison-section">
+        <div id="before-after">
+          <div class="text-panel" id="before-panel">
+            <h2>Before</h2>
+            <pre id="before-text"></pre>
+          </div>
+          <div class="text-panel" id="after-panel">
+            <h2>After</h2>
+            <pre id="after-text"></pre>
+          </div>
+        </div>
+        <div id="diff-highlight"></div>
+      </section>
+      <section id="export-section">
+        <button id="copy-btn">Copy</button>
+        <button id="pdf-btn">Save as PDF</button>
+        <button id="gdocs-btn">Export to Google Docs</button>
+      </section>
+    </main>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

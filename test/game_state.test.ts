@@ -1,16 +1,16 @@
 // Test for saveState and loadState
-import Game from "../../src/server/db/games";
+import { saveGame, getGame, GameState } from "../../src/server/db/games";
 
-const testGameId = 1;
-const testState = { foo: "bar", turn: 2, cards: [1,2,3] };
+const testGameId = "test-1";
+const testState: any = { id: testGameId, foo: "bar", turn: 2, cards: [1,2,3] };
 
 async function runTests() {
     // Save state
-    await Game.saveState(testGameId, testState);
+    saveGame(testState as GameState);
     console.log("Saved state.");
 
     // Load state
-    const loaded = await Game.loadState(testGameId);
+    const loaded = getGame(testGameId);
     console.log("Loaded state:", loaded);
 
     if (JSON.stringify(loaded) === JSON.stringify(testState)) {
@@ -20,4 +20,4 @@ async function runTests() {
     }
 }
 
-runTests().catch(console.error);
+runTests();
