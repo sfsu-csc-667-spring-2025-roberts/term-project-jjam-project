@@ -341,5 +341,33 @@ router.get("/:gameId/getCurrName", async (request: Request, response: Response) 
     }
 });
 
+//stop players from playing if somebody wins
+
+router.get("/:gameId/winner", async (request: Request, response: Response) => { // Added the handler
+    console.log("Winner detected!");
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+    try {
+        await Game.gameOver(gameId);
+        response.status(200).send();
+    } catch (error) {
+        console.error("Error setting winner:", error);
+        response.status(500).send("Failed to set win");
+    }
+});
+
+router.get("/:gameId/resetGame", async (request: Request, response: Response) => {
+    console.log("Resetting deck");
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+    try {
+        await Game.resetDeck(gameId);
+        response.status(200).send();
+    } catch (error) {
+        console.error("Error resetting deck:", error);
+        response.status(500).send("Failed to reset deck");
+    }
+});
+
 
 export default router;

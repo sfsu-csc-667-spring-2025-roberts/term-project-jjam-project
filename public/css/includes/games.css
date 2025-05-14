@@ -54,6 +54,7 @@
 .h { color: black; }/* Heart */
 .d { color: red; }/* Diamond */
 .c { color: green; }/* Club */
+.w { color: blueviolet; font-weight: bold;}/* Club */
 
 #chat-container {
     border: 1px solid #ccc;

@@ -12,6 +12,8 @@ const currentUserId = document.body.dataset.userId;
 const discardPileDiv = document.querySelector('#discard-pile') as HTMLDivElement | null;
 const drawCardButton = document.querySelector("#draw-card-button");
 const discardCard = document.querySelector("#hand-card-button");
+const resetGameButton = document.querySelector("#reset-game-button");
+const resetConfirmInput = document.querySelector("#resetConfirm") as HTMLInputElement | null;
 
 const cardMap = {
     1: { value: 'A', suit: 'S', display: 'A♠' },
@@ -21,7 +23,7 @@ const cardMap = {
     5: { value: '5', suit: 'S', display: '5♠' },
     6: { value: '6', suit: 'S', display: '6♠' },
     7: { value: '7', suit: 'S', display: '7♠' },
-    8: { value: '8', suit: 'S', display: '8♠' },
+    8: { value: '8', suit: 'W', display: '8' },
     9: { value: '9', suit: 'S', display: '9♠' },
     10: { value: '10', suit: 'S', display: '10♠' },
     11: { value: 'J', suit: 'S', display: 'J♠' },
@@ -34,7 +36,7 @@ const cardMap = {
     18: { value: '5', suit: 'H', display: '5♥' },
     19: { value: '6', suit: 'H', display: '6♥' },
     20: { value: '7', suit: 'H', display: '7♥' },
-    21: { value: '8', suit: 'H', display: '8♥' },
+    21: { value: '8', suit: 'W', display: '8' },
     22: { value: '9', suit: 'H', display: '9♥' },
     23: { value: '10', suit: 'H', display: '10♥' },
     24: { value: 'J', suit: 'H', display: 'J♥' },
@@ -47,7 +49,7 @@ const cardMap = {
     31: { value: '5', suit: 'D', display: '5♦' },
     32: { value: '6', suit: 'D', display: '6♦' },
     33: { value: '7', suit: 'D', display: '7♦' },
-    34: { value: '8', suit: 'D', display: '8♦' },
+    34: { value: '8', suit: 'W', display: '8' },
     35: { value: '9', suit: 'D', display: '9♦' },
     36: { value: '10', suit: 'D', display: '10♦' },
     37: { value: 'J', suit: 'D', display: 'J♦' },
@@ -60,7 +62,7 @@ const cardMap = {
     44: { value: '5', suit: 'C', display: '5♣' },
     45: { value: '6', suit: 'C', display: '6♣' },
     46: { value: '7', suit: 'C', display: '7♣' },
-    47: { value: '8', suit: 'C', display: '8♣' },
+    47: { value: '8', suit: 'W', display: '8' },
     48: { value: '9', suit: 'C', display: '9♣' },
     49: { value: '10', suit: 'C', display: '10♣' },
     50: { value: 'J', suit: 'C', display: 'J♣' },
@@ -98,7 +100,11 @@ async function fetchAndUpdateOpponentCardCounts() {
             playersData.forEach((player: { id: string; email: string; hand_count: number }) => {
                 if (player.id !== currentUserId && player.id !== '0' && player.id !== '-1') {
                     const opponentInfo = document.createElement('p');
-                    opponentInfo.textContent = `${player.email}: ${player.hand_count} cards`;
+                    if(player.hand_count != 0){
+                        opponentInfo.textContent = `${player.email}: ${player.hand_count} cards`;
+                    } else{
+                        opponentInfo.textContent = `${player.email}: WINNER!`;
+                    }
                     opponentCardCountsDiv.appendChild(opponentInfo);
                 }
             });
@@ -155,6 +161,13 @@ async function fetchAndUpdatePlayerHand() {
                 handData.forEach((card: { card_id: number }) => {
                     //@ts-ignore
                     const cardInfo = cardMap[card.card_id];
+
+                    //check if card is an 8 or not
+                    if ((card.card_id - 1) % 13 === 7) {
+                        console.log("8 on screen!");
+                        
+                    }
+
                     const cardElement = document.createElement('div');
                     cardElement.id = "hand-card-button";
                     cardElement.classList.add('card', cardInfo?.suit.toLowerCase()); //Add suit as a class for styling
@@ -177,32 +190,35 @@ async function fetchAndUpdatePlayerHand() {
                                     fetchAndUpdateOpponentCardCounts();
                                     console.log(`Turn Complete!`);
 
-                                    //get current turn player's name
-                                    try {
-                                        const currNameResponse = await fetch(`/games/${gameId}/getCurrName`);
-                                        if (currNameResponse.ok) {
-                                            const currentPlayerName = await currNameResponse.text(); // Assuming server sends plain text
-                                            console.log(`Current Player's Turn: ${currentPlayerName}`);
+                                    // Introduce a 2-second delay using setTimeout
+                                    setTimeout(async () => {
+                                        //get current turn player's name
+                                        try {
+                                            const currNameResponse = await fetch(`/games/${gameId}/getCurrName`);
+                                            if (currNameResponse.ok) {
+                                                const currentPlayerName = await currNameResponse.text(); // Assuming server sends plain text
+                                                console.log(`Current Player's Turn: ${currentPlayerName}`);
 
-                                            //Send a chat message that it is now the next player's turn
-                                            fetch(`/chat/${gameId}`, {
-                                                method: "post",
-                                                headers: {
-                                                    "Content-Type": "application/json",
-                                                },
-                                                body: JSON.stringify({
-                                                    message: `It is now ${currentPlayerName}'s turn!`,
-                                                    senderId: 0, //ID 0 is the system
-                                                }),
-                                            }).catch((error) => {
-                                                console.error("Error sending turn message:", error);
-                                            });
-                                        } else {
-                                            console.error("Failed to fetch current player name:", currNameResponse.status);
+                                                //Send a chat message that it is now the next player's turn
+                                                fetch(`/chat/${gameId}`, {
+                                                    method: "post",
+                                                    headers: {
+                                                        "Content-Type": "application/json",
+                                                    },
+                                                    body: JSON.stringify({
+                                                        message: `It is now ${currentPlayerName}'s turn!`,
+                                                        senderId: 0, //ID 0 is the system
+                                                    }),
+                                                }).catch((error) => {
+                                                    console.error("Error sending turn message:", error);
+                                                });
+                                            } else {
+                                                console.error("Failed to fetch current player name:", currNameResponse.status);
+                                            }
+                                        } catch (error) {
+                                            console.error("Error fetching current player name:", error);
                                         }
-                                    } catch (error) {
-                                        console.error("Error fetching current player name:", error);
-                                    }
+                                    }, 750); //time delay, prevent code not being able to figure out who's turn it is and getting stuck on player 0
 
                                 } else if (response.status === 403) {
                                     response.text().then(message => {
@@ -223,6 +239,9 @@ async function fetchAndUpdatePlayerHand() {
                 //insert game win state here
                 playerHandDiv.textContent = 'Your hand is empty.';
                 playerHandContainer.style.display = 'block';
+                fetch(`${gameId}/winner`, {
+                    method: "get",
+                });
             }
         } catch (error) {
             console.error('Error fetching hand:', error);
@@ -233,6 +252,7 @@ async function fetchAndUpdatePlayerHand() {
         console.error('Game ID or hand elements not found.');
     }
 }
+
 
 
 
@@ -319,6 +339,65 @@ showHandButton?.addEventListener('click', async (event) => {
     await fetchAndUpdateOpponentCardCounts();
     await fetchAndUpdateDiscard();
 });
+
+resetGameButton?.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const gameId = getGameId();
+
+    // Check if the input value is "reset" (case-insensitive)
+    if (resetConfirmInput && resetConfirmInput.value.toLowerCase() === "reset") {
+
+        //reset deck
+        fetch(`${gameId}/resetGame`, {
+            method: "get",
+        });
+
+        // Send a chat message that the deck has been reset
+        fetch(`/chat/${gameId}`, {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                message: "Deck reset!",
+                senderId: 0, //ID 0 is the system
+            }),
+        }).catch((error) => {
+            console.error("Error sending game deck reset message:", error);
+        });
+
+        //start new game
+        console.log(`games/${gameId}/start`);
+        fetch(`${gameId}/start`, {
+            method: "post",
+        });
+
+        // Send a chat message that the game has started
+        fetch(`/chat/${gameId}`, {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                message: "The game has started!",
+                senderId: 0, //ID 0 is the system
+            }),
+        }).catch((error) => {
+            console.error("Error sending game started message:", error);
+        });
+
+        // Make the start button disappear
+        if (startGameButton) {
+            startGameButton.style.display = 'none';
+        }
+        if (resetConfirmInput) {
+            resetConfirmInput.value = "";
+        }
+    } else {
+        alert("Please type 'reset' to confirm game reset."); //added an alert
+    }
+});
+
 
 // drawCardButton?.addEventListener('click', async (event) => {
 //     event.preventDefault();

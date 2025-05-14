@@ -185,3 +185,15 @@ FROM users
 WHERE
     id = $(id)
 `;
+
+export const RESET_DECK = `
+DELETE from game_cards
+WHERE game_id = $(gameId)
+`;
+
+
+export const CLEAR_TURNS = `
+UPDATE game_users
+SET is_current = false
+WHERE game_id = $(gameId)
+`;

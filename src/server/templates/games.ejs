@@ -23,7 +23,6 @@
                     <% if(isHost) { %>
                     <button id="start-game-button">Start Game</button>
                     <% } %>
-                    
                     <button id="announce-presence-button">Announce My Presence</button>
                     <div id="opponent-card-counts">
                     </div>
@@ -47,6 +46,12 @@
                         <button type="submit" id="send-button">Send</button>
                     </form>
                 </section>
+                <% if(isHost) { %>
+                    <form>
+                        <input type="text" name="resetConfirm" id="resetConfirm" placeholder="Type 'reset' to reset game"/>
+                        <button id="reset-game-button">Reset Game</button>
+                    </form>
+                <% } %>
             </section>
         </div>
     </div>

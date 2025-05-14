@@ -10,7 +10,7 @@ const chatContainer = document.querySelector<HTMLDivElement>(
     "#chat-container div"
 );
 
-socket.on(`chat:message:${roomId}`, ({message, sender, timestamp}: ChatMessage) => {
+socket.on(`chat:message:${roomId}`, ({ message, sender, timestamp }: ChatMessage) => {
     //do something with this
     //console.log("chat message", {message, sender, timestamp});
 
@@ -39,7 +39,7 @@ const chatInput = document.querySelector<HTMLFormElement>(
 chatForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     const message = chatInput?.value;
-    if (!message){
+    if (!message) {
         return;
     }
     chatInput.value = "";
@@ -52,7 +52,7 @@ chatForm?.addEventListener("submit", (event) => {
         body: JSON.stringify({
             message,
         }),
-    }).catch((error)=>{
+    }).catch((error) => {
         console.error("Error sending message:", error);
     })
 });
