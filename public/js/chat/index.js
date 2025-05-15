@@ -160,11 +160,11 @@
       });
     }
   }
-})({"ZbenO":[function(require,module,exports,__globalThis) {
+})({"kQu7H":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
-var HMR_PORT = 58425;
-var HMR_SERVER_PORT = 58425;
+var HMR_PORT = 1234;
+var HMR_SERVER_PORT = 1234;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
 var HMR_USE_SSE = false;
@@ -667,44 +667,9 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"9YDZd":[function(require,module,exports,__globalThis) {
-// Modern real-time chat client for lobby using Socket.IO
-const socket = window.io ? window.io() : null;
-
-function renderChat(messages) {
-    const messagesDiv = document.getElementById('messages');
-    if (!messagesDiv) return;
-    messagesDiv.innerHTML = '';
-    messages.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = 'chat-message' + (msg.userId === window.userId ? ' self' : '');
-        div.innerHTML = `
-            <img class="avatar" src="https://gravatar.com/avatar/${msg.gravatar || ''}?s=36&d=identicon" alt="avatar" />
-            <div class="msg-content">
-                <span class="username">${msg.username || msg.user || 'User'}</span>
-                <span class="timestamp">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : ''}</span><br/>
-                ${msg.message}
-            </div>
-        `;
-        messagesDiv.appendChild(div);
-    });
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-// Listen for chat events
-if (socket && window.lobbyId) {
-    socket.on('chatMessage', data => {
-        if (data.lobbyId === window.lobbyId) {
-            renderChat(data.chat);
-        }
-    });
-    // Optionally listen for lobbyState for initial chat
-    socket.on('lobbyState', data => {
-        if (data.lobbyId === window.lobbyId) {
-            renderChat(data.lobby.chat || []);
-        }
-    });
-}
-
+//console.log("Hello from the client (chat)");
+var _sockets = require("../sockets");
+const roomId = document.querySelector("#room-id")?.value;
 const chatContainer = document.querySelector("#chat-container div");
 (0, _sockets.socket).on("chat:message:0", ({ message, sender, timestamp })=>{
     //do something with this
@@ -761,10 +726,56 @@ chatForm?.addEventListener("submit", (event)=>{
 },{"../sockets":"2YbY8"}],"2YbY8":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+// Send a chat message to a lobby
+parcelHelpers.export(exports, "sendChatMessage", ()=>sendChatMessage);
+// Listen for incoming chat messages
+parcelHelpers.export(exports, "onChatMessage", ()=>onChatMessage);
+// --- Player Join/Leave/CardPlayed Helpers ---
+parcelHelpers.export(exports, "joinLobby", ()=>joinLobby);
+parcelHelpers.export(exports, "leaveLobby", ()=>leaveLobby);
+parcelHelpers.export(exports, "playCard", ()=>playCard);
+parcelHelpers.export(exports, "onPlayerJoined", ()=>onPlayerJoined);
+parcelHelpers.export(exports, "onPlayerLeft", ()=>onPlayerLeft);
+parcelHelpers.export(exports, "onCardPlayed", ()=>onCardPlayed);
 parcelHelpers.export(exports, "socket", ()=>socket);
 var _socketIoClient = require("socket.io-client");
 var _socketIoClientDefault = parcelHelpers.interopDefault(_socketIoClient);
 const socket = (0, _socketIoClientDefault.default)();
+function sendChatMessage(lobbyId, message) {
+    socket.emit("chatMessage", {
+        lobbyId,
+        message
+    });
+}
+function onChatMessage(callback) {
+    socket.on("chatMessage", callback);
+}
+function joinLobby(lobbyId) {
+    socket.emit("playerJoin", {
+        lobbyId
+    });
+}
+function leaveLobby(lobbyId) {
+    socket.emit("playerLeave", {
+        lobbyId
+    });
+}
+function playCard(lobbyId, card, nextPlayerId) {
+    socket.emit("cardPlayed", {
+        lobbyId,
+        card,
+        nextPlayerId
+    });
+}
+function onPlayerJoined(callback) {
+    socket.on("playerJoined", callback);
+}
+function onPlayerLeft(callback) {
+    socket.on("playerLeft", callback);
+}
+function onCardPlayed(callback) {
+    socket.on("cardPlayed", callback);
+}
 
 },{"socket.io-client":"8HBJR","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8HBJR":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -4402,6 +4413,6 @@ function Backoff(opts) {
     this.jitter = jitter;
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["ZbenO","9YDZd"], "9YDZd", "parcelRequirea38c", {})
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kQu7H","9YDZd"], "9YDZd", "parcelRequirea38c", {})
 
 //# sourceMappingURL=index.js.map

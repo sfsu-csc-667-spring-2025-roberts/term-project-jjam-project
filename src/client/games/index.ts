@@ -1,23 +1,22 @@
-import React, { useState, Suspense } from 'react';
+import { createChatComponent } from "./Chat";
 
-const Chat = React.lazy(() => import('./Chat'));
+document.addEventListener("DOMContentLoaded", () => {
+  const heading = document.createElement("h1");
+  heading.textContent = "Crazy 8s Online Lobby";
+  document.body.appendChild(heading);
 
-export default function GamesPage() {
-  const [showChat, setShowChat] = useState(false);
-  const lobbyId = 'example-lobby-id'; // Replace with actual lobby ID from your state/context
+  const toggleButton = document.createElement("button");
+  toggleButton.textContent = "Show Chat";
+  document.body.appendChild(toggleButton);
 
-  return (
-    <div>
-      <h1>Crazy 8s Online Lobby</h1>
-      <button onClick={() => setShowChat((s) => !s)}>
-        {showChat ? 'Hide' : 'Show'} Chat
-      </button>
-      {showChat && (
-        <Suspense fallback={<div>Loading chat...</div>}>
-          <Chat lobbyId={lobbyId} />
-        </Suspense>
-      )}
-      {/* ...other game UI... */}
-    </div>
-  );
-}
+  const chatComponent = createChatComponent("example-lobby-id");
+  chatComponent.style.display = "none";
+  document.body.appendChild(chatComponent);
+
+  let showChat = false;
+  toggleButton.addEventListener("click", () => {
+    showChat = !showChat;
+    chatComponent.style.display = showChat ? "block" : "none";
+    toggleButton.textContent = showChat ? "Hide Chat" : "Show Chat";
+  });
+});
