@@ -63,7 +63,10 @@ WHERE game_id=$(gameId)
 
 export const MOVE_DISCARD_CARD_SQL = `
 UPDATE game_cards
-SET pile = 2
+SET pile = CASE
+    WHEN card_id > 52 THEN 3 --if card is a 8 result, put it in pile 3 instead of 2 for future deletion
+        ELSE 2
+    END
 WHERE game_id = $(gameId)
     AND user_id = -1
     AND pile = 1;
@@ -71,7 +74,7 @@ WHERE game_id = $(gameId)
 
 export const DISCARD_CARD_SQL = `
 UPDATE game_cards
-SET user_id = -1, pile= 1 --discard deck
+SET user_id = -1, pile= 1 --top of discard deck
 WHERE game_id = $(gameId) --from this specific game
     AND card_id = $(cardId) --take this specific card
 `;
@@ -136,15 +139,23 @@ SELECT
 `;
 
 export const SHUFFLE_DISCARD_SQL = `
-    UPDATE game_cards
-    SET
-        user_id = 0,
-        pile = 1,
-        card_order = FLOOR(random() * 10000)
-    WHERE
-        game_id = $(gameId)
-        AND user_id = -1 
-        AND pile = 2
+DELETE FROM game_cards
+WHERE game_id = $(gameId)
+    AND user_id = -1
+    AND pile = 3;
+
+-- Then, if no card with pile = 3 was found and deleted, shuffle the discard pile
+INSERT INTO game_cards (user_id, pile, card_order, game_id, card_id)
+SELECT 0, 0, FLOOR(random() * 10000), $(gameId), card_id
+FROM game_cards
+WHERE game_id = $(gameId)
+    AND user_id = -1
+    AND pile = 2;
+
+DELETE FROM game_cards
+WHERE game_id = $(gameId)
+    AND user_id = -1
+    AND pile = 2;
 `;
 
 export const HIGHEST_SEAT_SQL = `
@@ -197,3 +208,13 @@ UPDATE game_users
 SET is_current = false
 WHERE game_id = $(gameId)
 `;
+
+export const WILD_EIGHT_CARD_RESULT = `
+INSERT INTO game_cards (game_id, user_id, card_id, card_order, pile)
+VALUES ($(gameId), -1, $(eightValue), 0, 1);--pile left as 1 as we don't need it to be 3 until after it is discarded
+`;
+
+
+
+
+

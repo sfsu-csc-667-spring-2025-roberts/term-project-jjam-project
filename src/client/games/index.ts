@@ -68,6 +68,10 @@ const cardMap = {
     50: { value: 'J', suit: 'C', display: 'J♣' },
     51: { value: 'Q', suit: 'C', display: 'Q♣' },
     52: { value: 'K', suit: 'C', display: 'K♣' },
+    53: { value: '8', suit: 'W', display: '8♠' },
+    54: { value: '8', suit: 'W', display: '8♥' },
+    55: { value: '8', suit: 'W', display: '8♦' },
+    56: { value: '8', suit: 'W', display: '8♣' },
 };
 
 function getGameId(): string | number {
@@ -100,9 +104,9 @@ async function fetchAndUpdateOpponentCardCounts() {
             playersData.forEach((player: { id: string; email: string; hand_count: number }) => {
                 if (player.id !== currentUserId && player.id !== '0' && player.id !== '-1') {
                     const opponentInfo = document.createElement('p');
-                    if(player.hand_count != 0){
+                    if (player.hand_count != 0) {
                         opponentInfo.textContent = `${player.email}: ${player.hand_count} cards`;
-                    } else{
+                    } else {
                         opponentInfo.textContent = `${player.email}: WINNER!`;
                     }
                     opponentCardCountsDiv.appendChild(opponentInfo);
@@ -115,23 +119,25 @@ async function fetchAndUpdateOpponentCardCounts() {
     }
 }
 
+//retrieves the current top card of the discard pile
 async function fetchAndUpdateDiscard() {
     if (gameId && discardPileDiv) {
         try {
-            const response = await fetch(`/games/${gameId}/discardTop`);
+            //see if card matches top discard
+            const response = await fetch(`/games/${gameId}/getDiscardTop`);
             if (!response.ok) {
                 console.error('Failed to fetch discard top:', response.status);
                 discardPileDiv.textContent = 'Discard pile is empty or failed to load.';
                 return;
             }
-            const discardData = await response.json();
+            const discardTopData = await response.json();
             discardPileDiv.innerHTML = '<h3>Discard Pile</h3>';
-            if (discardData) {
+            if (discardTopData) {
                 //@ts-ignore
-                const cardInfo = cardMap[discardData.card_id];
+                const cardInfo = cardMap[discardTopData.card_id];
                 const cardElement = document.createElement('div');
                 cardElement.classList.add('card', cardInfo?.suit.toLowerCase());
-                cardElement.textContent = cardInfo?.display || `ID: ${discardData.card_id}`;
+                cardElement.textContent = cardInfo?.display || `ID: ${discardTopData.card_id}`;
                 discardPileDiv.appendChild(cardElement);
             } else {
                 const emptyMessage = document.createElement('p');
@@ -144,6 +150,42 @@ async function fetchAndUpdateDiscard() {
         }
     }
 }
+
+//for discarding wild 8 cards
+//plan:
+//have user's desired suit read from button input as cardVal
+//based on that cardVal, generate a suit version of the 8
+//set top of discard as the wild 8
+//then, set top of discard pile as suited 8
+// async function fetchAndUpdateDiscardWildToSuited(cardVal: number) {
+//     if (gameId && discardPileDiv) {
+//         try {
+//             const response = await fetch(`/games/${gameId}/discardTop`);//discards the wild 8 card
+//             if (!response.ok) {
+//                 console.error('Failed to fetch discard top:', response.status);
+//                 discardPileDiv.textContent = 'Discard pile is empty or failed to load.';
+//                 return;
+//             }
+//             const discardData = await response.json();
+//             discardPileDiv.innerHTML = '<h3>Discard Pile</h3>';
+//             if (discardData) {
+//                 //@ts-ignore
+//                 const cardInfo = cardMap[discardData.card_id];
+//                 const cardElement = document.createElement('div');
+//                 cardElement.classList.add('card', cardInfo?.suit.toLowerCase());
+//                 cardElement.textContent = cardInfo?.display || `ID: ${discardData.card_id}`;
+//                 discardPileDiv.appendChild(cardElement);
+//             } else {
+//                 const emptyMessage = document.createElement('p');
+//                 emptyMessage.textContent = 'Empty';
+//                 discardPileDiv.appendChild(emptyMessage);
+//             }
+//         } catch (error) {
+//             console.error('Error fetching discard top:', error);
+//             discardPileDiv.textContent = 'Discard pile is empty or failed to load.';
+//         }
+//     }
+// }
 
 async function fetchAndUpdatePlayerHand() {
     if (gameId && playerHandDiv && playerHandContainer) {
@@ -163,74 +205,108 @@ async function fetchAndUpdatePlayerHand() {
                     const cardInfo = cardMap[card.card_id];
 
                     //check if card is an 8 or not
-                    if ((card.card_id - 1) % 13 === 7) {
-                        console.log("8 on screen!");
-                        
-                    }
+                    const isEight = (card.card_id - 1) % 13 === 7;
+                    // if (isEight) {
+                    //     console.log("8 on screen!");
+                    // }
 
                     const cardElement = document.createElement('div');
                     cardElement.id = "hand-card-button";
                     cardElement.classList.add('card', cardInfo?.suit.toLowerCase()); //Add suit as a class for styling
                     cardElement.textContent = cardInfo?.display || `ID: ${card.card_id}`;
-                    cardElement.addEventListener('click', () => {
+                    cardElement.addEventListener('click', async () => {
                         console.log(`Clicked card ID: ${card.card_id}`);
-                        fetch(`${gameId}/${card.card_id}/discard`, {
-                            method: "post",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                        })
-                            .then(async response => {
-                                if (response.ok) {
-                                    console.log(`Successfully discarded card ID: ${card.card_id}`);
-                                    //Remove the card element from the DOM
-                                    cardElement.remove();
-                                    //update cards on screen
-                                    fetchAndUpdateDiscard();
-                                    fetchAndUpdateOpponentCardCounts();
-                                    console.log(`Turn Complete!`);
 
-                                    // Introduce a 2-second delay using setTimeout
-                                    setTimeout(async () => {
-                                        //get current turn player's name
-                                        try {
-                                            const currNameResponse = await fetch(`/games/${gameId}/getCurrName`);
-                                            if (currNameResponse.ok) {
-                                                const currentPlayerName = await currNameResponse.text(); // Assuming server sends plain text
-                                                console.log(`Current Player's Turn: ${currentPlayerName}`);
+                        if (isEight) {
+                            const selectedSuit = await displaySuitSelectionPopup();
+                            if (!selectedSuit) {
+                                console.log("Suit selection cancelled or failed.");
+                                return; // Do not proceed with discard if no suit selected
+                            }
+                            let suitValue = 0;
+                            switch (selectedSuit) {
+                                case 'spade':
+                                    suitValue = 53;
+                                    break;
+                                case 'heart':
+                                    suitValue = 54;
+                                    break;
+                                case 'club':
+                                    suitValue = 55;
+                                    break;
+                                case 'diamond':
+                                    suitValue = 56;
+                                    break;
+                            }
+                            console.log(`Selected suit: ${selectedSuit}, value: ${suitValue}`);
+                            //for discarding wild 8 cards
+                            //plan:
+                            //have user's desired suit read from button input as cardVal
+                            //based on that cardVal, generate a suit version of the 8
+                            //set top of discard as the wild 8
+                            //then, set top of discard pile as suited 8
 
-                                                //Send a chat message that it is now the next player's turn
-                                                fetch(`/chat/${gameId}`, {
-                                                    method: "post",
-                                                    headers: {
-                                                        "Content-Type": "application/json",
-                                                    },
-                                                    body: JSON.stringify({
-                                                        message: `It is now ${currentPlayerName}'s turn!`,
-                                                        senderId: 0, //ID 0 is the system
-                                                    }),
-                                                }).catch((error) => {
-                                                    console.error("Error sending turn message:", error);
-                                                });
-                                            } else {
-                                                console.error("Failed to fetch current player name:", currNameResponse.status);
-                                            }
-                                        } catch (error) {
-                                            console.error("Error fetching current player name:", error);
-                                        }
-                                    }, 750); //time delay, prevent code not being able to figure out who's turn it is and getting stuck on player 0
-
-                                } else if (response.status === 403) {
-                                    response.text().then(message => {
-                                        console.log(`Discard failed: ${message}`);
-                                    });
-                                } else {
-                                    console.error("Error discarding card:", response.status);
-                                }
+                        } else {//only triggers if the card being discarded IS NOT an 8
+                            fetch(`${gameId}/${card.card_id}/discard`, {
+                                method: "post",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
                             })
-                            .catch((error) => {
-                                console.error("Error discarding card:", error);
-                            });
+                                .then(async response => {
+                                    if (response.ok) {
+                                        console.log(`Successfully discarded card ID: ${card.card_id}`);
+                                        //Remove the card element from the DOM
+                                        cardElement.remove();
+                                        //update cards on screen
+                                        fetchAndUpdateDiscard();
+                                        fetchAndUpdateOpponentCardCounts();
+                                        console.log(`Turn Complete!`);
+
+                                        // Introduce a 450ms delay using setTimeout
+                                        setTimeout(async () => {
+                                            //get current turn player's name
+                                            try {
+                                                const currNameResponse = await fetch(`/games/${gameId}/getCurrName`);
+                                                if (currNameResponse.ok) {
+                                                    const currentPlayerName = await currNameResponse.text(); // Assuming server sends plain text
+                                                    console.log(`Current Player's Turn: ${currentPlayerName}`);
+
+                                                    //Send a chat message that it is now the next player's turn as long as it's not user 0
+                                                    if (currentPlayerName != "deck_user@example.com") {
+                                                        fetch(`/chat/${gameId}`, {
+                                                            method: "post",
+                                                            headers: {
+                                                                "Content-Type": "application/json",
+                                                            },
+                                                            body: JSON.stringify({
+                                                                message: `It is now ${currentPlayerName}'s turn!`,
+                                                                senderId: 0, //ID 0 is the system
+                                                            }),
+                                                        }).catch((error) => {
+                                                            console.error("Error sending turn message:", error);
+                                                        });
+                                                    }
+                                                } else {
+                                                    console.error("Failed to fetch current player name:", currNameResponse.status);
+                                                }
+                                            } catch (error) {
+                                                console.error("Error fetching current player name:", error);
+                                            }
+                                        }, 450); //time delay, prevent code not being able to figure out who's turn it is and getting stuck on player 0
+
+                                    } else if (response.status === 403) {
+                                        response.text().then(message => {
+                                            console.log(`Discard failed: ${message}`);
+                                        });
+                                    } else {
+                                        console.error("Error discarding card:", response.status);
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error("Error discarding card:", error);
+                                });
+                        }
                     });
                     playerHandDiv.appendChild(cardElement);
                 });
@@ -251,6 +327,47 @@ async function fetchAndUpdatePlayerHand() {
     } else {
         console.error('Game ID or hand elements not found.');
     }
+}
+
+async function displaySuitSelectionPopup(): Promise<string | null> {
+    return new Promise((resolve) => {
+        const popup = document.createElement('div');
+        popup.style.position = 'fixed';
+        popup.style.top = '50%';
+        popup.style.left = '50%';
+        popup.style.transform = 'translate(-50%, -50%)';
+        popup.style.backgroundColor = 'white';
+        popup.style.padding = '20px';
+        popup.style.border = '1px solid black';
+        popup.style.zIndex = '1000';
+        popup.style.display = 'flex';
+        popup.style.flexDirection = 'column';
+        popup.style.gap = '10px';
+        popup.style.textAlign = 'center';
+
+        const message = document.createElement('p');
+        message.textContent = 'Select a suit for the 8:';
+        popup.appendChild(message);
+
+        const suits = ['heart', 'club', 'diamond', 'spade'];
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.style.display = 'flex';
+        buttonsContainer.style.gap = '10px';
+
+        suits.forEach(suit => {
+            const button = document.createElement('button');
+            button.textContent = suit.charAt(0).toUpperCase() + suit.slice(1);
+            button.addEventListener('click', () => {
+                console.log(`Selected suit: ${suit}`); // Added console.log here
+                document.body.removeChild(popup);
+                resolve(suit);
+            });
+            buttonsContainer.appendChild(button);
+        });
+        popup.appendChild(buttonsContainer);
+
+        document.body.appendChild(popup);
+    });
 }
 
 
@@ -397,14 +514,6 @@ resetGameButton?.addEventListener('click', async (event) => {
         alert("Please type 'reset' to confirm game reset."); //added an alert
     }
 });
-
-
-// drawCardButton?.addEventListener('click', async (event) => {
-//     event.preventDefault();
-//     await fetchAndUpdatePlayerHand();
-//     await fetchAndUpdateOpponentCardCounts();
-//     await fetchAndUpdateDiscard();
-// });
 
 //Fetch and update opponent card counts, player hand, and discard every 10 seconds
 setInterval(async () => {

@@ -124,16 +124,30 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
         const cardRank = (cardId - 1) % 13;
         const discardRank = (discardId - 1) % 13;
 
-        // Check for same suit (same chunk of 13)
-        const sameSuit = Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
+        // Check for same suit (same chunk of 13) unless it is an 8
+        let sameSuit = false;
+
+        //check if the top of the discard pile matches the suit of the player's chosen card
+        if(discardId <= 52 && cardId % 13 !== 8){
+            //if the card is not an 8, check if in the same suit normally
+            sameSuit = Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
+        }else{
+            //if the top of the discard pile is a suited 8, check suit but special
+            if((discardId == 53 && cardId >= 1 && cardId <= 13) ||//spade
+            (discardId == 54 && cardId >= 14 && cardId <= 26) ||//heart
+            (discardId == 55 && cardId >= 27 && cardId <= 39) ||//diamond
+            (discardId == 56 && cardId >= 40 && cardId <= 52)){//club
+                sameSuit = true;
+            }
+        }
 
         // Check for same rank
         const sameRank = cardRank === discardRank;
 
-        // Check if the card is an 8
-        const isEight = cardId % 13 === 8; // Assuming card IDs are 1-52, rank 8
+        // Check if the card is a wild 8, the only card that will go on top will be suited 8 cards
+        const isEight = cardId % 13 === 8; //Assuming card IDs are 1-52, rank 8 DO NOT REMOVE, necessary for initial 8 card removal, we place wild result on top
 
-        if (sameSuit || sameRank || isEight) {
+        if (sameSuit || sameRank) {
             console.log(`Card being discarded`);
 
             //move topdiscard card to pile 2
@@ -147,7 +161,7 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
             console.log(`Discard successful! ${cardId}`);
 
             response.status(200).send(`Discard successful! ${cardId}`);
-            
+
             //next player's turn
 
             //see if we are at the seat with the highest value
@@ -177,13 +191,17 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
                 //response.status(200).send("Turn complete!");
             }
 
+        } else if (isEight) {
+            console.log("Card is an 8! Handling wild card logic.");
+            //if the player plays an 8, the first thing that happens after choosing a suit is that the wild 8 is discarded
+            //then, the newly created suited 8 will immediately be discarded as well
+            //ONLY THEN will the next player get their turn
+            response.status(200).send("Card is an 8! Wild card played.");
         } else {
             console.log("Card doesn't match!");
             response.status(403).send("Card doesn't match!");
         }
     }
-
-
 });
 
 //draw a card
@@ -283,7 +301,7 @@ router.post("/:gameId/draw", async (request: Request, response: Response) => {
 });
 
 //get top of discard deck (the card you are supposed to match)
-router.get("/:gameId/discardTop", async (request: Request, response: Response) => {
+router.get("/:gameId/getDiscardTop", async (request: Request, response: Response) => {
     const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
     try {
@@ -366,6 +384,22 @@ router.get("/:gameId/resetGame", async (request: Request, response: Response) =>
     } catch (error) {
         console.error("Error resetting deck:", error);
         response.status(500).send("Failed to reset deck");
+    }
+});
+
+//create new card that is the result of choosing a suit for an 8 card that the next discard can follow
+router.post("/:gameId/:eightValue/generateWildResult", async (request: Request, response: Response) => {
+    console.log("Generating 8 card result");
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+    const { eightvalue: paramsEightValue } = request.params;
+    const eightValue = parseInt(paramsEightValue);
+    try {
+        await Game.generateWildResult(gameId, eightValue);
+        response.status(200).send();
+    } catch (error) {
+        console.error("Error generating 8 card result:", error);
+        response.status(500).send("Failed to generate 8 card result");
     }
 });
 
