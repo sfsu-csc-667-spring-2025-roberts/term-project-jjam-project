@@ -335,13 +335,25 @@ router.post("/:gameId/draw", async (request: Request, response: Response) => {
 
                     for (const card of hand) {
                         const cardId = card.card_id;
+                        let sameSuit = false;
+                        let sameRank = false;
 
-                        // Check for same suit (same chunk of 13)
-                        const sameSuit = discardId !== null && Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
-
-                        // Check for same rank (difference of 13)
-                        const sameRank = discardId !== null && Math.abs(cardId % 13) === Math.abs(discardId % 13);
-
+                        //if the top of the discard pile is not an 8
+                        if (discardId <= 52) {
+                            // Check for same suit (same chunk of 13)
+                            sameSuit = discardId !== null && Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
+                            // Check for same rank (difference of 13)
+                            sameRank = discardId !== null && Math.abs(cardId % 13) === Math.abs(discardId % 13);
+                        } else {
+                            //if the top of the discard pile is an 8
+                            if ((discardId == 53 && cardId >= 1 && cardId <= 13) ||//spade
+                                (discardId == 54 && cardId >= 14 && cardId <= 26) ||//heart
+                                (discardId == 55 && cardId >= 27 && cardId <= 39) ||//diamond
+                                (discardId == 56 && cardId >= 40 && cardId <= 52)) {//club
+                                console.log("card is of the same suit as the resulting 8");
+                                sameSuit = true;
+                            }
+                        }
                         // Check if the card is an 8
                         const isEight = cardId % 13 === 8; // Assuming card IDs are 1-52, rank 8
 
@@ -356,6 +368,7 @@ router.post("/:gameId/draw", async (request: Request, response: Response) => {
                     if (!searchDone) {
                         console.log("No playable card found in the current hand, drawing again.");
                         const deckCheck = await Game.isDeckEmpty(gameId);
+                        console.log(`DECK CHECK: ${deckCheck}`);
                         if (deckCheck) {
                             console.log("Deck Empty! Shuffling discard pile!");
                             Game.shuffleDiscard(gameId);

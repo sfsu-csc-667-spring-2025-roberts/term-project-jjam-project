@@ -132,10 +132,10 @@ const getState = async (gameId: number) => {
             playerInfo[id] = {
                 ...players[id],
                 hand: await db.manyOrNone(GET_CARD_SQL, {gameId, userId: id, limit: 52, pile: PLAYER_HAND,}),
-                stockPileTop: await db.one(GET_CARD_SQL, {gameId, userId: id, limit: 0, pile: STOCK_PILE,}),//vestigial, remove later
-                discardPiles: await Promise.all([DISCARD_1, DISCARD_2, DISCARD_3, DISCARD_4].map(pile => {//vestigial, remove later
-                    return db.oneOrNone(GET_CARD_SQL, {gameId, userId: id, limit: 0})//vestigial, remove later
-                })),//vestigial, remove later
+                // stockPileTop: await db.one(GET_CARD_SQL, {gameId, userId: id, limit: 0, pile: STOCK_PILE,}),//vestigial, remove later
+                // discardPiles: await Promise.all([DISCARD_1, DISCARD_2, DISCARD_3, DISCARD_4].map(pile => {//vestigial, remove later
+                //     return db.oneOrNone(GET_CARD_SQL, {gameId, userId: id, limit: 0})//vestigial, remove later
+                // })),//vestigial, remove later
             };
         }catch(error){
             console.error({error});

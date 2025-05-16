@@ -43,8 +43,8 @@ export type Player = {
 
 export type PlayerInfo = Player &{
     hand: Card[];
-    stockPileTop: Card;//vestigial, remove later
-    discardPiles: Card[][];//vestigial, remove later
+    //stockPileTop: Card;//vestigial, remove later
+    //discardPiles: Card[][];//vestigial, remove later
 }
 
 declare module 'express-session' {

@@ -460,60 +460,58 @@ showHandButton?.addEventListener('click', async (event) => {
 resetGameButton?.addEventListener('click', async (event) => {
     event.preventDefault();
     const gameId = getGameId();
-    setInterval(async () => {
-        // Check if the input value is "reset" (case-insensitive)
-        if (resetConfirmInput && resetConfirmInput.value.toLowerCase() === "reset") {
+    // Check if the input value is "reset" (case-insensitive)
+    if (resetConfirmInput && resetConfirmInput.value.toLowerCase() === "reset") {
 
-            //reset deck
-            fetch(`${gameId}/resetGame`, {
-                method: "get",
-            });
+        //reset deck
+        fetch(`${gameId}/resetGame`, {
+            method: "get",
+        });
 
-            // Send a chat message that the deck has been reset
-            fetch(`/chat/${gameId}`, {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    message: "Deck reset!",
-                    senderId: 0, //ID 0 is the system
-                }),
-            }).catch((error) => {
-                console.error("Error sending game deck reset message:", error);
-            });
+        // Send a chat message that the deck has been reset
+        fetch(`/chat/${gameId}`, {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                message: "Deck reset!",
+                senderId: 0, //ID 0 is the system
+            }),
+        }).catch((error) => {
+            console.error("Error sending game deck reset message:", error);
+        });
 
-            //start new game
-            console.log(`games/${gameId}/start`);
-            fetch(`${gameId}/start`, {
-                method: "post",
-            });
+        //start new game
+        console.log(`games/${gameId}/start`);
+        fetch(`${gameId}/start`, {
+            method: "post",
+        });
 
-            // Send a chat message that the game has started
-            fetch(`/chat/${gameId}`, {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    message: "The game has started!",
-                    senderId: 0, //ID 0 is the system
-                }),
-            }).catch((error) => {
-                console.error("Error sending game started message:", error);
-            });
+        // Send a chat message that the game has started
+        fetch(`/chat/${gameId}`, {
+            method: "post",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                message: "The game has started!",
+                senderId: 0, //ID 0 is the system
+            }),
+        }).catch((error) => {
+            console.error("Error sending game started message:", error);
+        });
 
-            // Make the start button disappear
-            if (startGameButton) {
-                startGameButton.style.display = 'none';
-            }
-            if (resetConfirmInput) {
-                resetConfirmInput.value = "";
-            }
-        } else {
-            alert("Please type 'reset' to confirm game reset."); //added an alert
+        // Make the start button disappear
+        if (startGameButton) {
+            startGameButton.style.display = 'none';
         }
-    }, 300);
+        if (resetConfirmInput) {
+            resetConfirmInput.value = "";
+        }
+    } else {
+        alert("Please type 'reset' to confirm game reset."); //added an alert
+    }
 });
 
 //Fetch and update opponent card counts, player hand, and discard every 10 seconds
