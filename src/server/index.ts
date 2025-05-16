@@ -25,8 +25,33 @@ import { Server } from "socket.io";
 //index.tx: setting up application, define application in other parts
 
 const app = express();
+
+// --- GLOBAL AUTH BYPASS FOR TESTING ---
+import authBypass from './middleware/auth';
+app.use(authBypass);
+// --- END BYPASS ---
+
 const server = http.createServer(app);
 const io = new Server(server);//sets up io server along side our express application
+app.set("io", io);
+
+// --- Crazy 8s Real-Time Multiplayer ---
+interface Crazy8sUpdate {
+  gameId: string;
+  state: any;
+}
+
+io.on("connection", (socket) => {
+  // Join a game room
+  socket.on("joinGame", (gameId: string) => {
+    socket.join(`game_${gameId}`);
+  });
+
+  // Listen for game state changes from server-side API (emit to all in room)
+  socket.on("gameStateUpdate", (update: Crazy8sUpdate) => {
+    io.to(`game_${update.gameId}`).emit("gameStateUpdate", update.state);
+  });
+});
 
 const PORT = process.env.PORT || 3000;
 
@@ -96,7 +121,7 @@ app.use("/test", routes.test);
 app.use("/auth", routes.auth);
 app.use("/lobby", middleware.authMiddleware, routes.lobby);//executes authentication middleware before doing anything else to verify user
 app.use("/chat", middleware.authMiddleware, routes.chat);
-app.use("/games", middleware.authMiddleware, routes.games);
+app.use("/api/games", routes.apiGames);
 
 //displays 404 error for urls that don't exist on site
 //put towards bottom because style is executed from top to bottom, we want this to execute once all other routes have been defined

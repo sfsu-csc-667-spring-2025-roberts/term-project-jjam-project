@@ -368,6 +368,4 @@ router.get("/:gameId/resetGame", async (request: Request, response: Response) =>
         response.status(500).send("Failed to reset deck");
     }
 });
-
-
 export default router;

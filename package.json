@@ -4,7 +4,7 @@
   "description": "[![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=18572614)",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production ts-node src/server/index.ts",
+    "start": "cross-env NODE_ENV=production ts-node src/server/index.ts",
     "start:dev": "concurrently --names backend,frontend -c blue,green \"npm run backend:dev\" \"npm run frontend:dev\"",
     "prepare": "husky",
     "db:create": "node-pg-migrate create -j ts --",
@@ -20,16 +20,16 @@
     "url": "git+https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-jjam-project.git"
   },
   "targets": {
-    "chat": {
-      "source": "./src/client/chat/index.ts"
-    },
-    "games": {
-      "source": "./src/client/games/index.ts"
-    },
-    "lobby": {
-      "source": "./src/client/lobby/index.ts"
-    }
+  "chat": {
+    "source": "./src/client/chat/index.ts"
   },
+  "games": {
+    "source": "./src/client/games/index.ts"
+  },
+  "lobby": {
+    "source": "./src/client/lobby/index.ts"
+  }
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-jjam-project#readme",
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unkown"
+    "**/*": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -50,19 +50,23 @@
     "@types/livereload": "^0.9.5",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.13.10",
+    "@types/socket.io": "^3.0.1",
     "concurrently": "^9.1.2",
     "connect-livereload": "^0.6.1",
+    "cross-env": "^7.0.3",
     "husky": "^9.1.7",
+    "jest": "^29.7.0",
     "lint-staged": "^15.5.0",
     "livereload": "^0.9.3",
     "nodemon": "^3.1.9",
     "parcel": "^2.14.4",
     "prettier": "^3.5.3",
+    "socket.io-client": "^4.8.1",
+    "supertest": "^7.1.0",
     "ts-node": "^10.9.2",
-    "typecript": "^0.0.1-security"
+   "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@types/socket.io": "^3.0.1",
     "@types/socket.io-client": "^1.4.36",
     "bcrypt": "^5.1.1",
     "connect-pg-simple": "^10.0.0",
@@ -76,7 +80,6 @@
     "node-pg-migrate": "^7.9.1",
     "pg": "^8.14.1",
     "pg-promise": "^11.13.0",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io": "^4.8.1"
   }
 }

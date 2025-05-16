@@ -214,3 +214,4 @@ export default {
     SOUTH_PILE: SOUTH_PILE,
     WEST_PILE: WEST_PILE}
 };
+

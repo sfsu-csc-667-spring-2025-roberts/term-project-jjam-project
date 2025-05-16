@@ -1,9 +1,8 @@
-import pgp from "pg-promise";//called pg promise because it returns async promise, how we execute asychronous code
-//returns resolve if promise is successful in doing its work, returns reject if not
+import pgpLib from "pg-promise";
+import dotenv from "dotenv";
+dotenv.config(); // Load .env before using process.env
 
-//const connection = pgp()(process.env.DATABASE_URL!);
-//postgres://postgres:1234@localhost:5432/spring-2025
+const pgp = pgpLib();
+const db = pgp(process.env.DATABASE_URL!);
 
-const connection = pgp()(process.env.DATABASE_URL!);
-export default connection; //object that reprsents data, how we communicate with our database
-
+export default db;

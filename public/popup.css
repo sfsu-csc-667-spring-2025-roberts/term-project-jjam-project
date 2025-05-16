@@ -1,0 +1,135 @@
+/* Minimalist, modern styling for Auto-Format AI Chrome extension */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  transition: background 0.2s, color 0.2s;
+}
+:root {
+  --bg: #f4f6fb;
+  --fg: #222;
+  --panel: #fff;
+  --border: #d1d5db;
+  --accent: #4f8cff;
+  --fade: #e0e7ef;
+}
+body.dark {
+  --bg: #181a1b;
+  --fg: #f4f6fb;
+  --panel: #23272a;
+  --border: #444;
+  --accent: #7ab2ff;
+  --fade: #22262a;
+}
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#mode-toggle {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+#input-section {
+  margin-bottom: 1rem;
+}
+#input-text {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 1rem;
+  background: var(--panel);
+  color: var(--fg);
+}
+#file-drop {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  background: var(--fade);
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  text-align: center;
+  color: #888;
+}
+#controls {
+  display: flex;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  align-items: center;
+}
+#format-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+#format-btn:hover {
+  box-shadow: 0 0 0 2px var(--accent), 0 2px 8px rgba(79,140,255,0.08);
+  animation: pulse 0.5s;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 var(--accent); }
+  70% { box-shadow: 0 0 0 8px var(--accent); }
+  100% { box-shadow: 0 0 0 0 var(--accent); }
+}
+#comparison-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+#before-after {
+  display: flex;
+  gap: 1rem;
+}
+.text-panel {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem;
+  min-height: 80px;
+  position: relative;
+}
+.text-panel h2 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1rem;
+  color: var(--accent);
+}
+#diff-highlight {
+  min-height: 24px;
+  font-size: 0.95rem;
+  color: #e53e3e;
+}
+#export-section {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+#export-section button {
+  flex: 1;
+  background: var(--panel);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.4rem 0;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+#export-section button:hover {
+  background: var(--accent);
+  color: #fff;
+}
