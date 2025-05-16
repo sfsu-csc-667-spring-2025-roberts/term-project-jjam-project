@@ -134,19 +134,19 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
         let sameRank = false;
 
         //check if the top of the discard pile matches the suit of the player's chosen card
-        if(discardId <= 52 && cardId % 13 !== 8){
+        if (discardId <= 52 && cardId % 13 !== 8) {
             //if the card is not an 8, check if in the same suit normally
             // Check for same rank
             sameRank = cardRank === discardRank;
             console.log("neither the top discard card nor the card being discarded is an 8");
             sameSuit = Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
-        }else{
+        } else {
             //if the top of the discard pile is a suited 8, check suit but special
             console.log("top of discard deck is an 8");
-            if((discardId == 53 && cardId >= 1 && cardId <= 13) ||//spade
-            (discardId == 54 && cardId >= 14 && cardId <= 26) ||//heart
-            (discardId == 55 && cardId >= 27 && cardId <= 39) ||//diamond
-            (discardId == 56 && cardId >= 40 && cardId <= 52)){//club
+            if ((discardId == 53 && cardId >= 1 && cardId <= 13) ||//spade
+                (discardId == 54 && cardId >= 14 && cardId <= 26) ||//heart
+                (discardId == 55 && cardId >= 27 && cardId <= 39) ||//diamond
+                (discardId == 56 && cardId >= 40 && cardId <= 52)) {//club
                 console.log("card is of the same suit as the resulting 8");
                 sameSuit = true;
             }
@@ -179,7 +179,7 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
             const currSeatVal = currSeatPromise.curr_seat;
 
             console.log(`comparing ${currSeatVal} and ${highestSeatInt}`);
-            if(currSeatVal == highestSeatInt){
+            if (currSeatVal == highestSeatInt) {
                 //if we are at top seat in game turn order
                 console.log("reset turn order!");
                 const lowestSeatPromise = await Game.getLowestSeat(gameId);
@@ -188,11 +188,11 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
                 Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
                 Game.isCurrentFlip(gameId, lowestSeatInt);//set is_current from false to true on player with lowest seat number this game
                 response.status(200).send("Turn complete!");
-            }else{
+            } else {
                 console.log("TURN OVER");
                 //console.log(currSeatVal+1);
                 Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
-                Game.isCurrentFlip(gameId, currSeatVal+1);//set is_current from false to true on next player
+                Game.isCurrentFlip(gameId, currSeatVal + 1);//set is_current from false to true on next player
                 response.status(200).send("Turn complete!");
             }
 
@@ -238,7 +238,7 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
             const currSeatVal = currSeatPromise.curr_seat;
 
             console.log(`comparing ${currSeatVal} and ${highestSeatInt}`);
-            if(currSeatVal == highestSeatInt){
+            if (currSeatVal == highestSeatInt) {
                 //if we are at top seat in game turn order
                 console.log("reset turn order!");
                 const lowestSeatPromise = await Game.getLowestSeat(gameId);
@@ -247,11 +247,11 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
                 Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
                 Game.isCurrentFlip(gameId, lowestSeatInt);//set is_current from false to true on player with lowest seat number this game
                 response.status(200).send("Turn complete!");
-            }else{
+            } else {
                 console.log("TURN OVER");
                 //console.log(currSeatVal+1);
                 Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
-                Game.isCurrentFlip(gameId, currSeatVal+1);//set is_current from false to true on next player
+                Game.isCurrentFlip(gameId, currSeatVal + 1);//set is_current from false to true on next player
                 response.status(200).send("Turn complete!");
             }
 
@@ -291,11 +291,25 @@ router.post("/:gameId/draw", async (request: Request, response: Response) => {
         const hand = await Game.getUserHand(gameId, userId);//get player hand
         for (const card of hand) {
             const cardId = card.card_id;
-            // Check for same suit (same chunk of 13)
-            const sameSuit = discardId !== null && Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
+            let sameSuit = false;
+            let sameRank = false;
 
-            // Check for same rank (difference of 13)
-            const sameRank = discardId !== null && Math.abs(cardId % 13) === Math.abs(discardId % 13);
+            //if the top of the discard pile is not an 8
+            if (discardId <= 52) {
+                // Check for same suit (same chunk of 13)
+                sameSuit = discardId !== null && Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
+                // Check for same rank (difference of 13)
+                sameRank = discardId !== null && Math.abs(cardId % 13) === Math.abs(discardId % 13);
+            } else {
+                //if the top of the discard pile is an 8
+                if ((discardId == 53 && cardId >= 1 && cardId <= 13) ||//spade
+                    (discardId == 54 && cardId >= 14 && cardId <= 26) ||//heart
+                    (discardId == 55 && cardId >= 27 && cardId <= 39) ||//diamond
+                    (discardId == 56 && cardId >= 40 && cardId <= 52)) {//club
+                    console.log("card is of the same suit as the resulting 8");
+                    sameSuit = true;
+                }
+            }
 
             // Check if the card is an 8
             const isEight = cardId % 13 === 8; // Assuming card IDs are 1-52, rank 8
@@ -342,7 +356,7 @@ router.post("/:gameId/draw", async (request: Request, response: Response) => {
                     if (!searchDone) {
                         console.log("No playable card found in the current hand, drawing again.");
                         const deckCheck = await Game.isDeckEmpty(gameId);
-                        if(deckCheck){
+                        if (deckCheck) {
                             console.log("Deck Empty! Shuffling discard pile!");
                             Game.shuffleDiscard(gameId);
                         }
@@ -403,7 +417,7 @@ router.get("/:gameId/players", async (request: Request, response: Response) => {
 //get current turn player name
 router.get("/:gameId/getCurrName", async (request: Request, response: Response) => {
     console.log("Getting player name");
-    const { gameId: paramsGameId } = request.params; 
+    const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
     try {
         const playerId = await Game.whoTurn(gameId);
