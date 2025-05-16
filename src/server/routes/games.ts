@@ -131,26 +131,26 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
 
         // Check for same suit (same chunk of 13) unless it is an 8
         let sameSuit = false;
+        let sameRank = false;
 
         //check if the top of the discard pile matches the suit of the player's chosen card
         if(discardId <= 52 && cardId % 13 !== 8){
             //if the card is not an 8, check if in the same suit normally
+            // Check for same rank
+            sameRank = cardRank === discardRank;
+            console.log("neither the top discard card nor the card being discarded is an 8");
             sameSuit = Math.floor((cardId - 1) / 13) === Math.floor((discardId - 1) / 13);
         }else{
             //if the top of the discard pile is a suited 8, check suit but special
+            console.log("top of discard deck is an 8");
             if((discardId == 53 && cardId >= 1 && cardId <= 13) ||//spade
             (discardId == 54 && cardId >= 14 && cardId <= 26) ||//heart
             (discardId == 55 && cardId >= 27 && cardId <= 39) ||//diamond
             (discardId == 56 && cardId >= 40 && cardId <= 52)){//club
+                console.log("card is of the same suit as the resulting 8");
                 sameSuit = true;
             }
         }
-
-        // Check for same rank
-        const sameRank = cardRank === discardRank;
-
-        // Check if the card is a wild 8, the only card that will go on top will be suited 8 cards
-        const isEight = cardId % 13 === 8; //Assuming card IDs are 1-52, rank 8 DO NOT REMOVE, necessary for initial 8 card removal, we place wild result on top
 
         if ((sameSuit || sameRank) && isEightVal == 0) {
             console.log(`Card being discarded`);
