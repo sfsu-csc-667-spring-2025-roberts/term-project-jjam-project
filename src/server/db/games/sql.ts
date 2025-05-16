@@ -218,4 +218,3 @@ VALUES ($(gameId), -1, $(eightValue), 0, 0);--pile left as 1 as we don't need it
 
 
 
-

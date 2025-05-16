@@ -66,13 +66,12 @@ const start = async (gameId: number) =>{
     await db.none(SETUP_DECK_SQL, {gameId });
     //get player count
     const players = await getPlayers(gameId);
-    console.log({players});
-
+    console.log("STARTING GAME********************************************************************************************");
+    
     //deal cards
     for(let i = 0; i < players.length; i++){
-        //console.log("player");
         //deal cards to a USER in a GAME with SOME NUMBER OF CARDS into SOME PILE
-        //await dealCards(players[i].id, gameId, 0, STOCK_PILE);//may be vestigial, remove later?
+        console.log("Dealing hand");
         await dealCards(players[i].id, gameId, 5, PLAYER_HAND);
     }
     await dealCards(-1, gameId, 1, PLAYER_HAND);//add card to discard pile

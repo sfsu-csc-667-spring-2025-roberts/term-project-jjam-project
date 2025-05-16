@@ -151,42 +151,6 @@ async function fetchAndUpdateDiscard() {
     }
 }
 
-//for discarding wild 8 cards
-//plan:
-//have user's desired suit read from button input as cardVal
-//based on that cardVal, generate a suit version of the 8
-//set top of discard as the wild 8
-//then, set top of discard pile as suited 8
-// async function fetchAndUpdateDiscardWildToSuited(cardVal: number) {
-//     if (gameId && discardPileDiv) {
-//         try {
-//             const response = await fetch(`/games/${gameId}/discardTop`);//discards the wild 8 card
-//             if (!response.ok) {
-//                 console.error('Failed to fetch discard top:', response.status);
-//                 discardPileDiv.textContent = 'Discard pile is empty or failed to load.';
-//                 return;
-//             }
-//             const discardData = await response.json();
-//             discardPileDiv.innerHTML = '<h3>Discard Pile</h3>';
-//             if (discardData) {
-//                 //@ts-ignore
-//                 const cardInfo = cardMap[discardData.card_id];
-//                 const cardElement = document.createElement('div');
-//                 cardElement.classList.add('card', cardInfo?.suit.toLowerCase());
-//                 cardElement.textContent = cardInfo?.display || `ID: ${discardData.card_id}`;
-//                 discardPileDiv.appendChild(cardElement);
-//             } else {
-//                 const emptyMessage = document.createElement('p');
-//                 emptyMessage.textContent = 'Empty';
-//                 discardPileDiv.appendChild(emptyMessage);
-//             }
-//         } catch (error) {
-//             console.error('Error fetching discard top:', error);
-//             discardPileDiv.textContent = 'Discard pile is empty or failed to load.';
-//         }
-//     }
-// }
-
 async function fetchAndUpdatePlayerHand() {
     if (gameId && playerHandDiv && playerHandContainer) {
         try {
@@ -351,9 +315,9 @@ async function fetchAndUpdatePlayerHand() {
                 //insert game win state here
                 playerHandDiv.textContent = 'Your hand is empty.';
                 playerHandContainer.style.display = 'block';
-                fetch(`${gameId}/winner`, {
-                    method: "get",
-                });
+                // fetch(`${gameId}/winner`, {
+                //     method: "get",
+                // });
             }
         } catch (error) {
             console.error('Error fetching hand:', error);

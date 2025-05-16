@@ -72,7 +72,7 @@ router.post("/:gameId/start", async (request: Request, response: Response) => {
     const gameInfo = await Game.getInfo(gameId);
     //console.log({gameInfo});
 
-    if (gameInfo.min_players < gameInfo.player_count) {
+    if (gameInfo.min_players > gameInfo.player_count) {
 
         //TODO: Broadcast game update stating "not enough players"
         response.status(200).send();
