@@ -39,6 +39,7 @@ FROM users, game_users WHERE users.id=game_users.user_id AND game_users.game_id=
 
 export const SETUP_DECK_SQL = `INSERT INTO game_cards(game_id, user_id, card_id, card_order, pile)
 SELECT $(gameId), 0, id, FLOOR(random() * 10000), 0 FROM cards
+WHERE id <= 52--prevent wild 8 card results from entering deck
 `;
 
 export const CLEAR_DECK_SQL = `
@@ -211,7 +212,7 @@ WHERE game_id = $(gameId)
 
 export const WILD_EIGHT_CARD_RESULT = `
 INSERT INTO game_cards (game_id, user_id, card_id, card_order, pile)
-VALUES ($(gameId), -1, $(eightValue), 0, 1);--pile left as 1 as we don't need it to be 3 until after it is discarded
+VALUES ($(gameId), -1, $(eightValue), 0, 0);--pile left as 1 as we don't need it to be 3 until after it is discarded
 `;
 
 

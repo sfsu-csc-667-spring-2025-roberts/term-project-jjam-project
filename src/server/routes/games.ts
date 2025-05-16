@@ -93,13 +93,18 @@ router.post("/:gameId/start", async (request: Request, response: Response) => {
 });
 
 //moves selected card from player's hand to player -1 (discard pile)
-router.post("/:gameId/:cardId/discard", async (request: Request, response: Response) => {
+router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, response: Response) => {
     const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
 
     //card that player wants to discard
     const { cardId: paramsCardId } = request.params;
     const cardId = parseInt(paramsCardId);
+
+    const { isEightVal: paramsIsEightVal } = request.params;
+    const isEightVal = parseInt(paramsIsEightVal);
+
+    console.log(`value of eightval: ${isEightVal}`);
 
     //check if it is this player's turn
     //@ts-ignore
@@ -147,7 +152,7 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
         // Check if the card is a wild 8, the only card that will go on top will be suited 8 cards
         const isEight = cardId % 13 === 8; //Assuming card IDs are 1-52, rank 8 DO NOT REMOVE, necessary for initial 8 card removal, we place wild result on top
 
-        if (sameSuit || sameRank) {
+        if ((sameSuit || sameRank) && isEightVal == 0) {
             console.log(`Card being discarded`);
 
             //move topdiscard card to pile 2
@@ -160,9 +165,9 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
             await Game.discardSelectedCard(gameId, cardId);
             console.log(`Discard successful! ${cardId}`);
 
-            response.status(200).send(`Discard successful! ${cardId}`);
+            //response.status(200).send(`Discard successful! ${cardId}`);
 
-            //next player's turn
+            //set up next player's turn
 
             //see if we are at the seat with the highest value
             const highestSeatPromise = await Game.getHighestSeat(gameId);
@@ -182,21 +187,74 @@ router.post("/:gameId/:cardId/discard", async (request: Request, response: Respo
                 console.log(lowestSeatInt);
                 Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
                 Game.isCurrentFlip(gameId, lowestSeatInt);//set is_current from false to true on player with lowest seat number this game
-                //response.status(200).send("Turn complete!");
+                response.status(200).send("Turn complete!");
             }else{
                 console.log("TURN OVER");
                 //console.log(currSeatVal+1);
                 Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
                 Game.isCurrentFlip(gameId, currSeatVal+1);//set is_current from false to true on next player
-                //response.status(200).send("Turn complete!");
+                response.status(200).send("Turn complete!");
             }
 
-        } else if (isEight) {
+        } else if (isEightVal != 0) {
             console.log("Card is an 8! Handling wild card logic.");
             //if the player plays an 8, the first thing that happens after choosing a suit is that the wild 8 is discarded
             //then, the newly created suited 8 will immediately be discarded as well
             //ONLY THEN will the next player get their turn
-            response.status(200).send("Card is an 8! Wild card played.");
+            //response.status(200).send("Card is an 8! Wild card played.");
+            console.log(`Card being discarded`);
+
+            //move topdiscard card to pile 2
+            await Game.moveDiscard(gameId);
+            console.log(`Discard pile clear!`);
+
+            //add wild card to discard
+            const fromUserId = userId;
+            console.log(`Discarding ${gameId}, ${cardId}, ${fromUserId}`);
+            await Game.discardSelectedCard(gameId, cardId);
+            console.log(`Discard successful! ${cardId}`);
+
+            //response.status(200).send(`Wild 8 discard successful! ${cardId}`);
+            console.log(`Wild 8 discard successful! ${cardId}`);
+
+            //clear discard pile again for suited 8
+            await Game.moveDiscard(gameId);
+            console.log(`Discard pile clear!`);
+
+            //add suited 8 to discard
+            console.log(`Discarding ${gameId}, ${cardId}, ${fromUserId}`);
+            await Game.discardSelectedCard(gameId, isEightVal);
+            console.log(`Discard successful! ${isEightVal}`);
+
+            //set up next player's turn
+
+            //see if we are at the seat with the highest value
+            const highestSeatPromise = await Game.getHighestSeat(gameId);
+            const highestSeatInt = highestSeatPromise.highest_seat;
+            console.log(highestSeatInt);
+
+            //get current player's seat number
+            const currSeatPromise = await Game.getSeat(gameId, turnIdInt);
+            const currSeatVal = currSeatPromise.curr_seat;
+
+            console.log(`comparing ${currSeatVal} and ${highestSeatInt}`);
+            if(currSeatVal == highestSeatInt){
+                //if we are at top seat in game turn order
+                console.log("reset turn order!");
+                const lowestSeatPromise = await Game.getLowestSeat(gameId);
+                const lowestSeatInt = lowestSeatPromise.lowest_seat;
+                console.log(lowestSeatInt);
+                Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
+                Game.isCurrentFlip(gameId, lowestSeatInt);//set is_current from false to true on player with lowest seat number this game
+                response.status(200).send("Turn complete!");
+            }else{
+                console.log("TURN OVER");
+                //console.log(currSeatVal+1);
+                Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
+                Game.isCurrentFlip(gameId, currSeatVal+1);//set is_current from false to true on next player
+                response.status(200).send("Turn complete!");
+            }
+
         } else {
             console.log("Card doesn't match!");
             response.status(403).send("Card doesn't match!");
@@ -392,8 +450,9 @@ router.post("/:gameId/:eightValue/generateWildResult", async (request: Request, 
     console.log("Generating 8 card result");
     const { gameId: paramsGameId } = request.params;
     const gameId = parseInt(paramsGameId);
-    const { eightvalue: paramsEightValue } = request.params;
+    const { eightValue: paramsEightValue } = request.params; // Changed to 'eightValue'
     const eightValue = parseInt(paramsEightValue);
+    console.log(`${eightValue}`);
     try {
         await Game.generateWildResult(gameId, eightValue);
         response.status(200).send();
