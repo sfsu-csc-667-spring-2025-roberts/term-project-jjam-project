@@ -160,11 +160,11 @@
       });
     }
   }
-})({"kQu7H":[function(require,module,exports,__globalThis) {
+})({"eYuph":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
-var HMR_PORT = 1234;
-var HMR_SERVER_PORT = 1234;
+var HMR_PORT = 57373;
+var HMR_SERVER_PORT = 57373;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
 var HMR_USE_SSE = false;
@@ -669,45 +669,32 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 },{}],"9YDZd":[function(require,module,exports,__globalThis) {
 //console.log("Hello from the client (chat)");
 var _sockets = require("../sockets");
+// Get the room ID from the input field
 const roomId = document.querySelector("#room-id")?.value;
+// Select the chat container div inside the #chat-container
 const chatContainer = document.querySelector("#chat-container div");
-(0, _sockets.socket).on("chat:message:0", ({ message, sender, timestamp })=>{
-    //do something with this
-    //console.log("chat message", {message, sender, timestamp});
-    //allows us to use a premade template instead of building the html within this page every time a message is made
+// Listen for incoming chat messages from the server
+(0, _sockets.socket).on(`chat:message:${roomId}`, ({ message, sender, timestamp })=>{
+    // Create a chat message using a template
     const container = document.querySelector("#chat-message-template")?.content.cloneNode(true);
     const img = container.querySelector("img");
     img.src = `https://gravatar.com/avatar/${sender.gravatar}?d=identicon`;
     img.alt = `Gravatar for ${sender.email}`;
     container.querySelector(".message-content").innerText = message;
     container.querySelector(".message-timestamp").innerText = new Date(timestamp).toLocaleTimeString();
-    // const container = document.createElement("div");
-    // container.classList.add("message");
-    //const img = document.createElement("img");
-    // img.src = `https://gravatar.com/avatar/${sender.gravatar}?d=identicon`;
-    // img.alt = `Gravatar for ${sender.email}`;
-    // img.classList.add("avatar");
-    // container.appendChild(img);
-    // const messageContainer = document.createElement("div");
-    // messageContainer.classList.add("message-wrapper");
-    // const messageContent = document.createElement("span");
-    // messageContent.classList.add("message-content");
-    // messageContent.innerText = message;
-    // const messageTimestamp = document.createElement("span");
-    // messageTimestamp.classList.add("message-timestamp");
-    // messageTimestamp.innerText = new Date(timestamp).toLocaleTimeString();
-    // messageContainer.appendChild(messageContent);
-    // messageContainer.appendChild(messageTimestamp);
-    // container.appendChild(messageContainer);
+    // Add the message to the chat container
     chatContainer?.appendChild(container);
 });
+// Get the form and input field from the DOM
 const chatForm = document.querySelector("#chat-container form");
 const chatInput = document.querySelector("#chat-container input");
+// Handle sending chat messages
 chatForm?.addEventListener("submit", (event)=>{
     event.preventDefault();
     const message = chatInput?.value;
     if (!message) return;
     chatInput.value = "";
+    // Send the message to the server
     fetch(`/chat/${roomId}`, {
         method: "post",
         headers: {
@@ -719,9 +706,9 @@ chatForm?.addEventListener("submit", (event)=>{
     }).catch((error)=>{
         console.error("Error sending message:", error);
     });
-}); // socket.on("test-event", (data: any) => { 
+}); // socket.on("test-event", (data: any) => {
  //     console.log("Received test-event:", data);
- // })
+ // });
 
 },{"../sockets":"2YbY8"}],"2YbY8":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -4413,6 +4400,6 @@ function Backoff(opts) {
     this.jitter = jitter;
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["kQu7H","9YDZd"], "9YDZd", "parcelRequirea38c", {})
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["eYuph","9YDZd"], "9YDZd", "parcelRequirea38c", {})
 
 //# sourceMappingURL=index.js.map
