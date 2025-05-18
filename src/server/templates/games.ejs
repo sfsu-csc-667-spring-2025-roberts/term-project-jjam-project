@@ -51,6 +51,17 @@
                         <input type="text" name="resetConfirm" id="resetConfirm" placeholder="Type 'reset' to reset game"/>
                         <button id="reset-game-button">Reset Game</button>
                     </form>
+                
+                    <form>
+                        <input type="text" name="deleteConfirm" id="deleteConfirm" placeholder="Type 'delete' to end game"/>
+                        <button id="delete-game-button">Delete Game</button>
+                    </form>
+                <% } %>
+                <% if(!isHost) { %>
+                    <form>
+                        <input type="text" name="leaveConfirm" id="leaveConfirm" placeholder="Type 'leave' to leave game"/>
+                        <button id="leave-game-button">Leave Game</button>
+                    </form>
                 <% } %>
             </section>
         </div>

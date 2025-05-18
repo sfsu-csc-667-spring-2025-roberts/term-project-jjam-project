@@ -495,5 +495,10 @@ router.post("/:gameId/:eightValue/generateWildResult", async (request: Request, 
     }
 });
 
+router.post("/:gameId/deleteGame", async (request: Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+    Game.deleteGame(gameId);
+});
 
 export default router;

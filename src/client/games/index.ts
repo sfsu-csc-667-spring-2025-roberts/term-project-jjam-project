@@ -14,6 +14,8 @@ const drawCardButton = document.querySelector("#draw-card-button");
 const discardCard = document.querySelector("#hand-card-button");
 const resetGameButton = document.querySelector("#reset-game-button");
 const resetConfirmInput = document.querySelector("#resetConfirm") as HTMLInputElement | null;
+const deleteGameButton = document.querySelector("#delete-game-button");
+const deleteConfirmInput = document.querySelector("#deleteConfirm") as HTMLInputElement | null;
 
 const cardMap = {
     1: { value: 'A', suit: 'S', display: 'A♠' },
@@ -457,6 +459,41 @@ showHandButton?.addEventListener('click', async (event) => {
     await fetchAndUpdateDiscard();
 });
 
+deleteGameButton?.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const gameId = getGameId();
+
+    const confirmation = confirm("Are you sure you want to delete this game?");
+
+    if (confirmation) {
+        // Player confirmed, proceed with deletion
+        try {
+            const response = await fetch(`${gameId}/deleteGame`, {
+                method: "POST",
+            });
+
+            if (response.ok) {
+                // Game deleted successfully, redirect to the lobby
+                console.log("Game deleted successfully");
+                window.location.href = "/lobby";
+            } else {
+                // Handle potential errors during deletion
+                console.error("Error deleting game:", response.status);
+                alert("Failed to delete the game. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error deleting game:", error);
+            alert("An unexpected error occurred while deleting the game.");
+        }
+    } else {
+        // Player cancelled, reset the input field if it exists
+        if (deleteConfirmInput) {
+            deleteConfirmInput.value = "";
+        }
+        console.log("Game deletion cancelled.");
+    }
+});
+
 resetGameButton?.addEventListener('click', async (event) => {
     event.preventDefault();
     const gameId = getGameId();
@@ -519,6 +556,7 @@ setInterval(async () => {
     await fetchAndUpdateOpponentCardCounts();
     await fetchAndUpdatePlayerHand();
     await fetchAndUpdateDiscard(); // Call the new function in the interval
+    //add function that if the game has been deleted, kicks you back to lobby
 }, 5000);
 
 //Initial fetch of opponent card counts and discard pile
