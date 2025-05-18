@@ -220,4 +220,9 @@ DELETE from games
 WHERE id = $(gameId)
 `;
 
+export const DOES_GAME_EXIST_SQL = `
+SELECT id
+FROM games
+WHERE id = $1;
+`;
 

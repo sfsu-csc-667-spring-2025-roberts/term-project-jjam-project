@@ -553,10 +553,28 @@ resetGameButton?.addEventListener('click', async (event) => {
 
 //Fetch and update opponent card counts, player hand, and discard every 10 seconds
 setInterval(async () => {
-    await fetchAndUpdateOpponentCardCounts();
-    await fetchAndUpdatePlayerHand();
-    await fetchAndUpdateDiscard(); // Call the new function in the interval
-    //add function that if the game has been deleted, kicks you back to lobby
+    try {
+        const response = await fetch(`/games/${gameId}/doesGameExist`);
+
+        if (response.status === 404) {
+            //Explicitly check for 404 Not Found: Game deleted on server
+            console.log("Game not found (404). Redirecting to lobby.");
+            window.location.href = "/lobby";
+            return;
+        }
+
+        if (!response.ok) {
+            console.error(`Error checking game existence: ${response.status}`);
+            return;
+        }
+
+        //If the game exists (200 OK and data.exists is true), continue updates
+        await fetchAndUpdateOpponentCardCounts();
+        await fetchAndUpdatePlayerHand();
+        await fetchAndUpdateDiscard();
+    } catch (error) {
+        console.error("Network error checking game existence:", error);
+    }
 }, 5000);
 
 //Initial fetch of opponent card counts and discard pile

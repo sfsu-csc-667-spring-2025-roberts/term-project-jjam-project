@@ -501,4 +501,27 @@ router.post("/:gameId/deleteGame", async (request: Request, response: Response) 
     Game.deleteGame(gameId);
 });
 
+//@ts-ignore
+router.get("/:gameId/doesGameExist", async (request: Request, response: Response) => {
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId, 10);
+
+    console.log(`gameId: ${gameId}`);
+    const gameExistsResult = await Game.gameExist(gameId);
+    console.log(`gameExistsResult:`, gameExistsResult); // Print the result
+
+    if (isNaN(gameId)) {
+        return response.status(400).json({ error: 'Invalid gameId provided.' });
+    }
+
+    if (gameExistsResult) {
+        console.log(`Game exists with ID: ${gameExistsResult.id}`);
+        return response.status(200).json({ exists: true, id: gameExistsResult }); // Return the whole result
+    } else {
+        console.log(`Game with ID ${gameId} does not exist.`);
+        return response.status(404).json({ exists: false, id: null });
+    }
+});
+
+
 export default router;
