@@ -226,3 +226,36 @@ FROM games
 WHERE id = $1;
 `;
 
+export const DISCARD_PLAYER_HAND_SQL = `--if a player leaves a game, send their cards into the discard pile
+UPDATE game_cards
+SET user_id = -1, pile= 2 --send to discard deck all cards
+WHERE game_id = $(gameId) --from this specific game
+    AND user_id = $(userId) --from this specific player
+`;
+
+export const LEAVE_GAME_SQL = `--only run AFTER clearing their hand
+DELETE 
+FROM game_users
+WHERE game_id = $(gameId)
+AND user_id = $(userId)
+`;
+
+export const DOES_SEAT_EXIST_SQL = `
+SELECT seat
+FROM game_users
+WHERE game_id = $1
+AND seat = $2
+`;
+
+export const GET_GAME_PLAYER_COUNT = `
+SELECT COUNT(*) AS number_of_players
+FROM game_users
+WHERE game_id = $1;
+`;
+
+export const GET_NEXT_SEAT = `
+SELECT MIN(seat) AS next_seat
+FROM game_users
+WHERE game_id = $1
+AND seat > $2
+`;

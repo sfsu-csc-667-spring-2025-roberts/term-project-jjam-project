@@ -16,6 +16,8 @@ const resetGameButton = document.querySelector("#reset-game-button");
 const resetConfirmInput = document.querySelector("#resetConfirm") as HTMLInputElement | null;
 const deleteGameButton = document.querySelector("#delete-game-button");
 const deleteConfirmInput = document.querySelector("#deleteConfirm") as HTMLInputElement | null;
+const leaveGameButton = document.querySelector("#leave-game-button");
+const leaveConfirmInput = document.querySelector("#leaveConfirm") as HTMLInputElement | null;
 
 const cardMap = {
     1: { value: 'A', suit: 'S', display: 'A♠' },
@@ -548,6 +550,41 @@ resetGameButton?.addEventListener('click', async (event) => {
         }
     } else {
         alert("Please type 'reset' to confirm game reset."); //added an alert
+    }
+});
+
+leaveGameButton?.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const gameId = getGameId();
+
+    const confirmation = confirm("Are you sure you want to leave this game?");
+
+    if (confirmation) {
+        // Player confirmed, proceed with deletion
+        try {
+            const response = await fetch(`${gameId}/leaveGame`, {
+                method: "POST",
+            });
+
+            if (response.ok) {
+                // Game deleted successfully, redirect to the lobby
+                console.log("Exited successfully");
+                window.location.href = "/lobby";
+            } else {
+                // Handle potential errors during deletion
+                console.error("Error leaving game:", response.status);
+                alert("Failed to leave the game. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error leave game:", error);
+            alert("An unexpected error occurred while leaving the game.");
+        }
+    } else {
+        // Player cancelled, reset the input field if it exists
+        if (leaveConfirmInput) {
+            leaveConfirmInput.value = "";
+        }
+        console.log("Game cancelled.");
     }
 });
 

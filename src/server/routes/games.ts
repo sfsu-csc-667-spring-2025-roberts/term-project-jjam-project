@@ -198,7 +198,28 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
                 console.log("TURN OVER");
                 //console.log(currSeatVal+1);
                 Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
-                Game.isCurrentFlip(gameId, currSeatVal + 1);//set is_current from false to true on next player
+
+                //add code that checks if next seat is valid (player may have left)
+
+                let nextSeatValPromise = await Game.getNextSeat(gameId, currSeatVal);
+                console.log(`next player seat: ${nextSeatValPromise.next_seat}`);
+                
+
+                // let playerCount = await Game.getPlayerCount(gameId);
+                // console.log(`PLAYER COUNT: ${playerCount}`);
+                // let tempPlayerFound = false;
+                // let tempNextSeat = 1;
+
+                // if(playerCount > 1) {
+                //     while (!tempPlayerFound){
+                //         console.log(`temp: ${tempNextSeat}`);
+
+                //         ++tempNextSeat;
+                //     }
+                // }
+
+
+                Game.isCurrentFlip(gameId, nextSeatValPromise.next_seat);//set is_current from false to true on next player
                 response.status(200).send("Turn complete!");
             }
 
@@ -257,7 +278,11 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
                 console.log("TURN OVER");
                 //console.log(currSeatVal+1);
                 Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
-                Game.isCurrentFlip(gameId, currSeatVal + 1);//set is_current from false to true on next player
+
+                //check next available seat
+                let nextSeatValPromise = await Game.getNextSeat(gameId, currSeatVal);
+
+                Game.isCurrentFlip(gameId, nextSeatValPromise.next_seat);//set is_current from false to true on next player
                 response.status(200).send("Turn complete!");
             }
 
