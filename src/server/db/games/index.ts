@@ -219,7 +219,9 @@ const discardHand = async (gameId: number, userId: number) => {
 };
 
 const leaveGame = async (gameId: number, userId: number) => {
-    return await db.none(LEAVE_GAME_SQL, { gameId, userId });
+    await db.none(DISCARD_PLAYER_HAND_SQL, {gameId, userId});//discard player hand
+
+    return await db.none(LEAVE_GAME_SQL, { gameId, userId });//delete player from game table
 };
 
 // const seatCheck = async (gameId: number, seat: number) => {

@@ -548,5 +548,21 @@ router.get("/:gameId/doesGameExist", async (request: Request, response: Response
     }
 });
 
+router.post("/:gameId/:userId/leaveGame", async (request: Request, response: Response) => {
+    console.log("Leaving game");
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+    const { userId: paramsUserId } = request.params;
+    const userId = parseInt(paramsUserId);
+
+    try {
+        await Game.leaveGame(gameId, userId);
+        response.status(200).send();
+    } catch (error) {
+        console.error("Error leaving game:", error);
+        response.status(500).send("Failed to leave game");
+    }
+
+});
 
 export default router;

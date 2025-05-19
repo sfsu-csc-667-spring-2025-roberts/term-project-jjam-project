@@ -556,19 +556,32 @@ resetGameButton?.addEventListener('click', async (event) => {
 leaveGameButton?.addEventListener('click', async (event) => {
     event.preventDefault();
     const gameId = getGameId();
+    const userId = getUserId();
 
     const confirmation = confirm("Are you sure you want to leave this game?");
 
     if (confirmation) {
         // Player confirmed, proceed with deletion
         try {
-            const response = await fetch(`${gameId}/leaveGame`, {
+            const response = await fetch(`${gameId}/${userId}/leaveGame`, {
                 method: "POST",
             });
 
             if (response.ok) {
-                // Game deleted successfully, redirect to the lobby
+                //Left game successfully, redirect to the lobby
                 console.log("Exited successfully");
+                fetch(`/chat/${gameId}`, {
+                    method: "post",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        message: `Player #${userId} has left the game. Discarding his hand to discard pile`,
+                        senderId: 0,
+                    }),
+                }).catch((error) => {
+                    console.error("Error sending announcement message:", error);
+                });
                 window.location.href = "/lobby";
             } else {
                 // Handle potential errors during deletion
@@ -587,6 +600,8 @@ leaveGameButton?.addEventListener('click', async (event) => {
         console.log("Game cancelled.");
     }
 });
+
+
 
 //Fetch and update opponent card counts, player hand, and discard every 10 seconds
 setInterval(async () => {
