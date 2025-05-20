@@ -203,7 +203,7 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
 
                 let nextSeatValPromise = await Game.getNextSeat(gameId, currSeatVal);
                 console.log(`next player seat: ${nextSeatValPromise.next_seat}`);
-                
+
 
                 // let playerCount = await Game.getPlayerCount(gameId);
                 // console.log(`PLAYER COUNT: ${playerCount}`);
@@ -555,14 +555,99 @@ router.post("/:gameId/:userId/leaveGame", async (request: Request, response: Res
     const { userId: paramsUserId } = request.params;
     const userId = parseInt(paramsUserId);
 
-    try {
-        await Game.leaveGame(gameId, userId);
-        response.status(200).send();
-    } catch (error) {
-        console.error("Error leaving game:", error);
-        response.status(500).send("Failed to leave game");
+    //check if it is this player's turn
+    //@ts-ignore
+    console.log(`User who is leaving: ${userId}`);
+
+
+    const turnIdPromise = Game.whoTurn(gameId); //Store the Promise
+    const turnIdInt = await turnIdPromise; //convert promise to int
+    console.log(`Comparing users ${userId} to ${turnIdInt}`);
+
+    //if it was this player's turn when they left
+    if (userId == turnIdInt) {
+        //see if we are at the seat with the highest value
+        const highestSeatPromise = await Game.getHighestSeat(gameId);
+        const highestSeatInt = highestSeatPromise.highest_seat;
+        console.log(highestSeatInt);
+
+        //get current player's seat number
+        const currSeatPromise = await Game.getSeat(gameId, turnIdInt);
+        const currSeatVal = currSeatPromise.curr_seat;
+
+        console.log(`comparing ${currSeatVal} and ${highestSeatInt}`);
+        if (currSeatVal == highestSeatInt) {
+            //if we are at top seat in game turn order
+            console.log("reset turn order!");
+            const lowestSeatPromise = await Game.getLowestSeat(gameId);
+            const lowestSeatInt = lowestSeatPromise.lowest_seat;
+            console.log(lowestSeatInt);
+            Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
+            Game.isCurrentFlip(gameId, lowestSeatInt);//set is_current from false to true on player with lowest seat number this game
+            response.status(200).send("Turn complete!");
+        } else {
+            console.log("TURN OVER");
+            //console.log(currSeatVal+1);
+            Game.isCurrentFlip(gameId, currSeatVal);//set is_current from true to false on current player
+
+            //add code that checks if next seat is valid (player may have left)
+
+            let nextSeatValPromise = await Game.getNextSeat(gameId, currSeatVal);
+            console.log(`next player seat: ${nextSeatValPromise.next_seat}`);
+
+            Game.isCurrentFlip(gameId, nextSeatValPromise.next_seat);//set is_current from false to true on next player
+            response.status(200).send("Turn complete!");
+
+            try {
+                await Game.leaveGame(gameId, userId);
+                response.status(200).send();
+            } catch (error) {
+                console.error("Error leaving game:", error);
+                response.status(500).send("Failed to leave game");
+            }
+
+        }
+    } else {
+        try {
+            await Game.leaveGame(gameId, userId);
+            response.status(200).send();
+        } catch (error) {
+            console.error("Error leaving game:", error);
+            response.status(500).send("Failed to leave game");
+        }
     }
 
+});
+
+router.post("/:gameId/setInGamePlayers", async (request: Request, response: Response) => {
+    console.log("Converting all users in game to players");
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+
+    try {
+        await Game.spectateToPlayer(gameId);
+        response.status(200).send();
+    } catch (error) {
+        console.error("Error setting users as players:", error);
+        response.status(500).send("Failed to leave set users as players");
+    }
+
+});
+
+router.get("/:gameId/:userId/isPlayer", async (request: Request, response: Response) => {
+    console.log("Checking if user is player or spectator");
+    const { gameId: paramsGameId } = request.params;
+    const gameId = parseInt(paramsGameId);
+    const { userId: paramsUserId } = request.params;
+    const userId = parseInt(paramsUserId);
+
+    try {
+        const isPlayer = await Game.isPlayerCheck(gameId, userId); //Await the result
+        response.status(200).send(isPlayer); //Send the boolean result
+    } catch (error) {
+        console.error("Error checking if user is player or spectator:", error);
+        response.status(500).send("Failed to check if user is player or spectator");
+    }
 });
 
 export default router;

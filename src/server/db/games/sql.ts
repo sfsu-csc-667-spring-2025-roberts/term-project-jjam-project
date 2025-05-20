@@ -42,6 +42,19 @@ SELECT $(gameId), 0, id, FLOOR(random() * 10000), 0 FROM cards
 WHERE id <= 52--prevent wild 8 card results from entering deck
 `;
 
+export const CONVERT_SPECTATOR_TO_PLAYER = `
+UPDATE game_users
+SET ingame = TRUE
+WHERE game_id = $1;
+`;
+
+export const IS_PLAYER = `
+SELECT ingame
+FROM game_users
+WHERE game_id = $1
+AND user_id = $2
+`;
+
 export const CLEAR_DECK_SQL = `
 UPDATE game_cards
 DELETE
@@ -163,12 +176,14 @@ export const HIGHEST_SEAT_SQL = `
     SELECT MAX(seat) AS highest_seat
     FROM game_users
     WHERE game_id = $(gameId)
+    AND ingame = true
 `;
 
 export const LOWEST_SEAT_SQL = `
     SELECT MIN(seat) AS lowest_seat
     FROM game_users
     WHERE game_id = $(gameId)
+    AND ingame = true
 `;
 
 export const CONVERT_ID_TO_SEAT = `
@@ -258,4 +273,5 @@ SELECT MIN(seat) AS next_seat
 FROM game_users
 WHERE game_id = $1
 AND seat > $2
+AND ingame = true --prevent players who join midgame from being able to play
 `;

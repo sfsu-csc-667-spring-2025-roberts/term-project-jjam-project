@@ -1,7 +1,7 @@
 import { LargeNumberLike } from "crypto";
 import { DBGameUser, GameInfo, PlayerInfo, User } from "../../../../types/global";
 import db from "../connection";
-import { ADD_PLAYER, CLEAR_TURNS, CONDITIONALLY_JOIN_SQL, CONVERT_ID_TO_SEAT, CREATE_SQL, DEAL_CARDS_SQL, DELETE_GAME_SQL, DISCARD_CARD_SQL, DISCARD_PLAYER_HAND_SQL, DOES_GAME_EXIST_SQL, DOES_SEAT_EXIST_SQL, FLIP_IS_CURRENT, GET_CARD_SQL, GET_DISCARDED_CARD_ID_SQL, GET_GAME_INFO_SQL, GET_GAME_PLAYER_COUNT, GET_IS_CURRENT, GET_NEXT_SEAT, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYER_NAME_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, HIGHEST_SEAT_SQL, IS_DECK_EMPTY_SQL, IS_HOST_SQL, LEAVE_GAME_SQL, LOWEST_SEAT_SQL, MOVE_DISCARD_CARD_SQL, RESET_DECK, SET_IS_CURRENT_SQL, SETUP_DECK_SQL, SHUFFLE_DISCARD_SQL, WILD_EIGHT_CARD_RESULT } from "./sql";
+import { ADD_PLAYER, CLEAR_TURNS, CONDITIONALLY_JOIN_SQL, CONVERT_ID_TO_SEAT, CONVERT_SPECTATOR_TO_PLAYER, CREATE_SQL, DEAL_CARDS_SQL, DELETE_GAME_SQL, DISCARD_CARD_SQL, DISCARD_PLAYER_HAND_SQL, DOES_GAME_EXIST_SQL, DOES_SEAT_EXIST_SQL, FLIP_IS_CURRENT, GET_CARD_SQL, GET_DISCARDED_CARD_ID_SQL, GET_GAME_INFO_SQL, GET_GAME_PLAYER_COUNT, GET_IS_CURRENT, GET_NEXT_SEAT, GET_PLAYER_HAND_COUNT_SQL, GET_PLAYER_HAND_SQL, GET_PLAYER_NAME_SQL, GET_PLAYERS_SQL, GET_PLAYERS_WITH_HAND_COUNT_SQL, HIGHEST_SEAT_SQL, IS_DECK_EMPTY_SQL, IS_HOST_SQL, IS_PLAYER, LEAVE_GAME_SQL, LOWEST_SEAT_SQL, MOVE_DISCARD_CARD_SQL, RESET_DECK, SET_IS_CURRENT_SQL, SETUP_DECK_SQL, SHUFFLE_DISCARD_SQL, WILD_EIGHT_CARD_RESULT } from "./sql";
 
 // const CREATE_SQL = `INSERT INTO games (name, min_players, max_players, password) VALUES ($1, $2, $3, $4) RETURNING id`;
 // const ADD_PLAYER = `INSERT INTO game_users (game_id, user_id) VALUES ($1, $2)`;
@@ -248,11 +248,19 @@ const getNextSeat = async (gameId: number, seat: number) => {
     return await db.one(GET_NEXT_SEAT, [gameId, seat]);
 };
 
+const spectateToPlayer = async (gameId: number) => {
+    return await db.one(CONVERT_SPECTATOR_TO_PLAYER, [gameId]);
+};
+
+const isPlayerCheck = async (gameId: number, userId:number) => {
+    return await db.one(IS_PLAYER, [gameId, userId]);
+};
+
 export default {
     create, join, getHost, getState, getInfo, start, dealCards, getPlayers, setCurrentPlayer, getUserHand,
     getPlayersWithHandCount, getDiscardTop, drawCard, whoTurn, moveDiscard, discardSelectedCard, isDeckEmpty, shuffleDiscard,
     getHighestSeat, getLowestSeat, getSeat, isCurrentFlip, getPlayerName, gameOver, resetDeck, generateWildResult, deleteGame,
-    gameExist, discardHand, leaveGame, getNextSeat,
+    gameExist, discardHand, leaveGame, getNextSeat, spectateToPlayer, isPlayerCheck,
     cardLocations: {
         STOCK_PILE: STOCK_PILE,
         PLAYER_HAND: PLAYER_HAND,

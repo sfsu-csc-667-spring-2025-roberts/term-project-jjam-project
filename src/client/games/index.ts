@@ -19,6 +19,8 @@ const deleteConfirmInput = document.querySelector("#deleteConfirm") as HTMLInput
 const leaveGameButton = document.querySelector("#leave-game-button");
 const leaveConfirmInput = document.querySelector("#leaveConfirm") as HTMLInputElement | null;
 
+let playersInGame: number[] = [];
+
 const cardMap = {
     1: { value: 'A', suit: 'S', display: 'A♠' },
     2: { value: '2', suit: 'S', display: '2♠' },
@@ -105,14 +107,24 @@ async function fetchAndUpdateOpponentCardCounts() {
             }
             const playersData = await response.json();
             opponentCardCountsDiv.innerHTML = '<h3>Opponent Card Counts</h3>';
-            playersData.forEach((player: { id: string; email: string; hand_count: number }) => {
+            playersData.forEach(async (player: { id: string; email: string; hand_count: number }) => {
                 if (player.id !== currentUserId && player.id !== '0' && player.id !== '-1') {
                     const opponentInfo = document.createElement('p');
-                    if (player.hand_count != 0) {
-                        opponentInfo.textContent = `${player.email}: ${player.hand_count} cards`;
+                    //check if user is player or waiting for next round
+                    const isPlayerPromise = await fetch(`${gameId}/${parseInt(player.id)}/isPlayer`);
+                    const isPlayerText = await isPlayerPromise.json();
+                    const isPlayer = isPlayerText.ingame;
+                    //console.log(`IS PLAYER: ${isPlayer}`)
+                    if (isPlayer) {
+                        if (player.hand_count != 0) {
+                            opponentInfo.textContent = `${player.email}: ${player.hand_count} cards`;
+                        } else {
+                            opponentInfo.textContent = `${player.email}: WINNER!`;
+                        }
                     } else {
-                        opponentInfo.textContent = `${player.email}: WINNER!`;
+                        opponentInfo.textContent = `${player.email}: Spectator`;
                     }
+
                     opponentCardCountsDiv.appendChild(opponentInfo);
                 }
             });
@@ -319,9 +331,21 @@ async function fetchAndUpdatePlayerHand() {
                 //insert game win state here
                 playerHandDiv.textContent = 'Your hand is empty.';
                 playerHandContainer.style.display = 'block';
-                fetch(`${gameId}/winner`, {
-                    method: "get",
-                });
+
+                //if user is a player and they have no cards, they win
+                const userId = getUserId();
+
+                const isPlayerPromise = await fetch(`${gameId}/${userId}/isPlayer`);
+
+                const isPlayer = await isPlayerPromise.text();
+
+                if (isPlayer == "true") {
+                    console.log("Winner found!");
+                    fetch(`${gameId}/winner`, {
+                        method: "get",
+                    });
+                }
+
             }
         } catch (error) {
             console.error('Error fetching hand:', error);
@@ -382,6 +406,11 @@ startGameButton?.addEventListener("click", event => {
     const gameId = getGameId();
     console.log(`games/${gameId}/start`);
     fetch(`${gameId}/start`, {
+        method: "post",
+    });
+
+    //set all in game users to players
+    fetch(`${gameId}/setInGamePlayers`, {
         method: "post",
     });
 
@@ -507,6 +536,7 @@ resetGameButton?.addEventListener('click', async (event) => {
             method: "get",
         });
 
+
         // Send a chat message that the deck has been reset
         fetch(`/chat/${gameId}`, {
             method: "post",
@@ -524,6 +554,11 @@ resetGameButton?.addEventListener('click', async (event) => {
         //start new game
         console.log(`games/${gameId}/start`);
         fetch(`${gameId}/start`, {
+            method: "post",
+        });
+
+        //set all in game users to players
+        fetch(`${gameId}/setInGamePlayers`, {
             method: "post",
         });
 
@@ -582,24 +617,39 @@ leaveGameButton?.addEventListener('click', async (event) => {
                 }).catch((error) => {
                     console.error("Error sending announcement message:", error);
                 });
-                window.location.href = "/lobby";
-            } else {
-                // Handle potential errors during deletion
-                console.error("Error leaving game:", response.status);
-                alert("Failed to leave the game. Please try again.");
+                const currNameResponse = await fetch(`/games/${gameId}/getCurrName`);
+                if (currNameResponse.ok) {
+                    const currentPlayerName = await currNameResponse.text();
+                    console.log(`Current Player's Turn: ${currentPlayerName}`);
+                    fetch(`/chat/${gameId}`, {
+                        method: "post",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            message: `It is now ${currentPlayerName}'s turn!`,
+                            senderId: 0,
+                        })
+                    });
+                }
+                    window.location.href = "/lobby";
+                } else {
+                    // Handle potential errors during deletion
+                    console.error("Error leaving game:", response.status);
+                    alert("Failed to leave the game. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error leave game:", error);
+                alert("An unexpected error occurred while leaving the game.");
             }
-        } catch (error) {
-            console.error("Error leave game:", error);
-            alert("An unexpected error occurred while leaving the game.");
+        } else {
+            // Player cancelled, reset the input field if it exists
+            if (leaveConfirmInput) {
+                leaveConfirmInput.value = "";
+            }
+            console.log("Game cancelled.");
         }
-    } else {
-        // Player cancelled, reset the input field if it exists
-        if (leaveConfirmInput) {
-            leaveConfirmInput.value = "";
-        }
-        console.log("Game cancelled.");
-    }
-});
+    });
 
 
 
