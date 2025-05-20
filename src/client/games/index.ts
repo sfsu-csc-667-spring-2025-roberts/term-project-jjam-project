@@ -19,8 +19,6 @@ const deleteConfirmInput = document.querySelector("#deleteConfirm") as HTMLInput
 const leaveGameButton = document.querySelector("#leave-game-button");
 const leaveConfirmInput = document.querySelector("#leaveConfirm") as HTMLInputElement | null;
 
-let playersInGame: number[] = [];
-
 const cardMap = {
     1: { value: 'A', suit: 'S', display: 'A♠' },
     2: { value: '2', suit: 'S', display: '2♠' },
