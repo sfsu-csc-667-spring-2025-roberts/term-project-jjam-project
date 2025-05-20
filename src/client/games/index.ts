@@ -20,62 +20,71 @@ const leaveGameButton = document.querySelector("#leave-game-button");
 const leaveConfirmInput = document.querySelector("#leaveConfirm") as HTMLInputElement | null;
 
 const cardMap = {
-    1: { value: 'A', suit: 'S', display: 'A♠' },
-    2: { value: '2', suit: 'S', display: '2♠' },
-    3: { value: '3', suit: 'S', display: '3♠' },
-    4: { value: '4', suit: 'S', display: '4♠' },
-    5: { value: '5', suit: 'S', display: '5♠' },
-    6: { value: '6', suit: 'S', display: '6♠' },
-    7: { value: '7', suit: 'S', display: '7♠' },
-    8: { value: '8', suit: 'W', display: '8' },
-    9: { value: '9', suit: 'S', display: '9♠' },
-    10: { value: '10', suit: 'S', display: '10♠' },
-    11: { value: 'J', suit: 'S', display: 'J♠' },
-    12: { value: 'Q', suit: 'S', display: 'Q♠' },
-    13: { value: 'K', suit: 'S', display: 'K♠' },
-    14: { value: 'A', suit: 'H', display: 'A♥' },
-    15: { value: '2', suit: 'H', display: '2♥' },
-    16: { value: '3', suit: 'H', display: '3♥' },
-    17: { value: '4', suit: 'H', display: '4♥' },
-    18: { value: '5', suit: 'H', display: '5♥' },
-    19: { value: '6', suit: 'H', display: '6♥' },
-    20: { value: '7', suit: 'H', display: '7♥' },
-    21: { value: '8', suit: 'W', display: '8' },
-    22: { value: '9', suit: 'H', display: '9♥' },
-    23: { value: '10', suit: 'H', display: '10♥' },
-    24: { value: 'J', suit: 'H', display: 'J♥' },
-    25: { value: 'Q', suit: 'H', display: 'Q♥' },
-    26: { value: 'K', suit: 'H', display: 'K♥' },
-    27: { value: 'A', suit: 'D', display: 'A♦' },
-    28: { value: '2', suit: 'D', display: '2♦' },
-    29: { value: '3', suit: 'D', display: '3♦' },
-    30: { value: '4', suit: 'D', display: '4♦' },
-    31: { value: '5', suit: 'D', display: '5♦' },
-    32: { value: '6', suit: 'D', display: '6♦' },
-    33: { value: '7', suit: 'D', display: '7♦' },
-    34: { value: '8', suit: 'W', display: '8' },
-    35: { value: '9', suit: 'D', display: '9♦' },
-    36: { value: '10', suit: 'D', display: '10♦' },
-    37: { value: 'J', suit: 'D', display: 'J♦' },
-    38: { value: 'Q', suit: 'D', display: 'Q♦' },
-    39: { value: 'K', suit: 'D', display: 'K♦' },
-    40: { value: 'A', suit: 'C', display: 'A♣' },
-    41: { value: '2', suit: 'C', display: '2♣' },
-    42: { value: '3', suit: 'C', display: '3♣' },
-    43: { value: '4', suit: 'C', display: '4♣' },
-    44: { value: '5', suit: 'C', display: '5♣' },
-    45: { value: '6', suit: 'C', display: '6♣' },
-    46: { value: '7', suit: 'C', display: '7♣' },
-    47: { value: '8', suit: 'W', display: '8' },
-    48: { value: '9', suit: 'C', display: '9♣' },
-    49: { value: '10', suit: 'C', display: '10♣' },
-    50: { value: 'J', suit: 'C', display: 'J♣' },
-    51: { value: 'Q', suit: 'C', display: 'Q♣' },
-    52: { value: 'K', suit: 'C', display: 'K♣' },
-    53: { value: '8', suit: 'S', display: '8♠' },
-    54: { value: '8', suit: 'H', display: '8♥' },
-    55: { value: '8', suit: 'D', display: '8♦' },
-    56: { value: '8', suit: 'C', display: '8♣' },
+    // Spades (Suit Value 1)
+    1: { value: 'A', suit: 'S', display: 'A♠', imageName: '1 (1).png' },
+    2: { value: '2', suit: 'S', display: '2♠', imageName: '1 (2).png' },
+    3: { value: '3', suit: 'S', display: '3♠', imageName: '1 (3).png' },
+    4: { value: '4', suit: 'S', display: '4♠', imageName: '1 (4).png' },
+    5: { value: '5', suit: 'S', display: '5♠', imageName: '1 (5).png' },
+    6: { value: '6', suit: 'S', display: '6♠', imageName: '1 (6).png' },
+    7: { value: '7', suit: 'S', display: '7♠', imageName: '1 (7).png' },
+    8: { value: '8', suit: 'W', display: '8', imageName: '1 (8).png' }, // Base 8 of Spades
+    9: { value: '9', suit: 'S', display: '9♠', imageName: '1 (9).png' },
+    10: { value: '10', suit: 'S', display: '10♠', imageName: '1 (10).png' },
+    11: { value: 'J', suit: 'S', display: 'J♠', imageName: '1 (11).png' },
+    12: { value: 'Q', suit: 'S', display: 'Q♠', imageName: '1 (12).png' },
+    13: { value: 'K', suit: 'S', display: 'K♠', imageName: '1 (13).png' },
+
+    // Hearts (Suit Value 2)
+    14: { value: 'A', suit: 'H', display: 'A♥', imageName: '2 (1).png' },
+    15: { value: '2', suit: 'H', display: '2♥', imageName: '2 (2).png' },
+    16: { value: '3', suit: 'H', display: '3♥', imageName: '2 (3).png' },
+    17: { value: '4', suit: 'H', display: '4♥', imageName: '2 (4).png' },
+    18: { value: '5', suit: 'H', display: '5♥', imageName: '2 (5).png' },
+    19: { value: '6', suit: 'H', display: '6♥', imageName: '2 (6).png' },
+    20: { value: '7', suit: 'H', display: '7♥', imageName: '2 (7).png' },
+    21: { value: '8', suit: 'W', display: '8', imageName: '2 (8).png' }, // Base 8 of Hearts
+    22: { value: '9', suit: 'H', display: '9♥', imageName: '2 (9).png' },
+    23: { value: '10', suit: 'H', display: '10♥', imageName: '2 (10).png' },
+    24: { value: 'J', suit: 'H', display: 'J♥', imageName: '2 (11).png' },
+    25: { value: 'Q', suit: 'H', display: 'Q♥', imageName: '2 (12).png' },
+    26: { value: 'K', suit: 'H', display: 'K♥', imageName: '2 (13).png' },
+
+    // Diamonds (Suit Value 3)
+    27: { value: 'A', suit: 'D', display: 'A♦', imageName: '3 (1).png' },
+    28: { value: '2', suit: 'D', display: '2♦', imageName: '3 (2).png' },
+    29: { value: '3', suit: 'D', display: '3♦', imageName: '3 (3).png' },
+    30: { value: '4', suit: 'D', display: '4♦', imageName: '3 (4).png' },
+    31: { value: '5', suit: 'D', display: '5♦', imageName: '3 (5).png' },
+    32: { value: '6', suit: 'D', display: '6♦', imageName: '3 (6).png' },
+    33: { value: '7', suit: 'D', display: '7♦', imageName: '3 (7).png' },
+    34: { value: '8', suit: 'W', display: '8', imageName: '3 (8).png' }, // Base 8 of Diamonds
+    35: { value: '9', suit: 'D', display: '9♦', imageName: '3 (9).png' },
+    36: { value: '10', suit: 'D', display: '10♦', imageName: '3 (10).png' },
+    37: { value: 'J', suit: 'D', display: 'J♦', imageName: '3 (11).png' },
+    38: { value: 'Q', suit: 'D', display: 'Q♦', imageName: '3 (12).png' },
+    39: { value: 'K', suit: 'D', display: 'K♦', imageName: '3 (13).png' },
+
+    // Clubs (Suit Value 4)
+    40: { value: 'A', suit: 'C', display: 'A♣', imageName: '4 (1).png' },
+    41: { value: '2', suit: 'C', display: '2♣', imageName: '4 (2).png' },
+    42: { value: '3', suit: 'C', display: '3♣', imageName: '4 (3).png' },
+    43: { value: '4', suit: 'C', display: '4♣', imageName: '4 (4).png' },
+    44: { value: '5', suit: 'C', display: '5♣', imageName: '4 (5).png' },
+    45: { value: '6', suit: 'C', display: '6♣', imageName: '4 (6).png' },
+    46: { value: '7', suit: 'C', display: '7♣', imageName: '4 (7).png' },
+    47: { value: '8', suit: 'W', display: '8', imageName: '4 (8).png' }, // Base 8 of Clubs
+    48: { value: '9', suit: 'C', display: '9♣', imageName: '4 (9).png' },
+    49: { value: '10', suit: 'C', display: '10♣', imageName: '4 (10).png' },
+    50: { value: 'J', suit: 'C', display: 'J♣', imageName: '4 (11).png' },
+    51: { value: 'Q', suit: 'C', display: 'Q♣', imageName: '4 (12).png' },
+    52: { value: 'K', suit: 'C', display: 'K♣', imageName: '4 (13).png' },
+
+    // Special Wild 8s (imageName matches card_id)
+    53: { value: '8', suit: 'S', display: '8♠', imageName: '53.png' }, // Wild Spade 8
+    54: { value: '8', suit: 'H', display: '8♥', imageName: '54.png' }, // Wild Heart 8
+    55: { value: '8', suit: 'D', display: '8♦', imageName: '55.png' }, // Wild Diamond 8
+    56: { value: '8', suit: 'C', display: '8♣', imageName: '56.png' }, // Wild Club 8
 };
 
 function getGameId(): string | number {
@@ -145,13 +154,22 @@ async function fetchAndUpdateDiscard() {
                 return;
             }
             const discardTopData = await response.json();
-            discardPileDiv.innerHTML = '<h3>Discard Pile</h3>';
+            discardPileDiv.innerHTML = '<h3>Discard Pile</h3>'; // Clear previous content
+
             if (discardTopData) {
                 //@ts-ignore
                 const cardInfo = cardMap[discardTopData.card_id];
+
                 const cardElement = document.createElement('div');
-                cardElement.classList.add('card', cardInfo?.suit.toLowerCase());
-                cardElement.textContent = cardInfo?.display || `ID: ${discardTopData.card_id}`;
+                // Apply the container class, similar to player hand
+                cardElement.classList.add('card-image-container', cardInfo?.suit.toLowerCase());
+
+                const cardImage = document.createElement('img');
+                cardImage.src = `/images/cards/${cardInfo?.imageName}`; // Correct path from web root
+                cardImage.alt = cardInfo?.display || `ID: ${discardTopData.card_id}`;
+                cardImage.classList.add('card-image'); // Add the image styling class
+
+                cardElement.appendChild(cardImage);
                 discardPileDiv.appendChild(cardElement);
             } else {
                 const emptyMessage = document.createElement('p');
@@ -184,14 +202,18 @@ async function fetchAndUpdatePlayerHand() {
 
                     //check if card is an 8 or not
                     const isEight = (card.card_id - 1) % 13 === 7;
-                    // if (isEight) {
-                    //     console.log("8 on screen!");
-                    // }
 
                     const cardElement = document.createElement('div');
                     cardElement.id = "hand-card-button";
-                    cardElement.classList.add('card', cardInfo?.suit.toLowerCase()); //Add suit as a class for styling
-                    cardElement.textContent = cardInfo?.display || `ID: ${card.card_id}`;
+                    // Apply the new class to the container div
+                    cardElement.classList.add('card-image-container', cardInfo?.suit.toLowerCase()); //Add suit as a class for styling
+
+                    const cardImage = document.createElement('img');
+                    cardImage.src = `/images/cards/${cardInfo?.imageName}`; // Assuming cardInfo.imageName holds the PNG filename
+                    cardImage.alt = cardInfo?.display || `ID: ${card.card_id}`;
+                    cardImage.classList.add('card-image'); // Keep a class for the image itself
+                    cardElement.appendChild(cardImage);
+
                     cardElement.addEventListener('click', async () => {
                         console.log(`Clicked card ID: ${card.card_id}`);
                         if (isEight) {
@@ -216,10 +238,6 @@ async function fetchAndUpdatePlayerHand() {
                                     break;
                             }
                             console.log(`Selected suit: ${selectedSuit}, value: ${suitValue}`);
-                            //for discarding wild 8 cards
-                            //plan:
-                            //have user's desired suit read from button input as cardVal
-                            //based on that cardVal, generate a suit version of the 8 using /:gameId/:eightValue/generateWildResult
                             await fetch(`${gameId}/${suitValue}/generateWildResult`, {
                                 method: "post",
                                 headers: {
@@ -238,7 +256,6 @@ async function fetchAndUpdatePlayerHand() {
                                 fetchAndUpdateDiscard();
                                 fetchAndUpdateOpponentCardCounts();
                                 console.log(`Wild 8 played and turn complete (client-side)!`);
-                                // Now fetch and send the turn message
                                 setTimeout(async () => {
                                     try {
                                         const currNameResponse = await fetch(`/games/${gameId}/getCurrName`);
@@ -272,9 +289,7 @@ async function fetchAndUpdatePlayerHand() {
                             } else {
                                 console.error("Error discarding card:", discardResponse.status);
                             }
-
-
-                        } else {//only triggers if the card being discarded IS NOT an 8
+                        } else { //only triggers if the card being discarded IS NOT an 8
                             const discardResponse = await fetch(`${gameId}/${card.card_id}/${0}/discard`, {
                                 method: "post",
                                 headers: {
@@ -330,20 +345,27 @@ async function fetchAndUpdatePlayerHand() {
                 playerHandDiv.textContent = 'Your hand is empty.';
                 playerHandContainer.style.display = 'block';
 
-                //if user is a player and they have no cards, they win
                 const userId = getUserId();
+                // const isPlayerPromise = await fetch(`${gameId}/${userId}/isPlayer`);
+                // const isPlayer = await isPlayerPromise.text();
+
+                // if (isPlayer == "true") {
+                //     console.log("Winner found!");
+                //     fetch(`${gameId}/winner`, {
+                //         method: "get",
+                //     });
+                // }
 
                 const isPlayerPromise = await fetch(`${gameId}/${userId}/isPlayer`);
-
-                const isPlayer = await isPlayerPromise.text();
-
-                if (isPlayer == "true") {
+                const isPlayerText = await isPlayerPromise.json();
+                const isPlayer = isPlayerText.ingame;
+                //console.log(`IS PLAYER: ${isPlayer}`)
+                if (isPlayer) {
                     console.log("Winner found!");
                     fetch(`${gameId}/winner`, {
                         method: "get",
                     });
                 }
-
             }
         } catch (error) {
             console.error('Error fetching hand:', error);
@@ -630,24 +652,24 @@ leaveGameButton?.addEventListener('click', async (event) => {
                         })
                     });
                 }
-                    window.location.href = "/lobby";
-                } else {
-                    // Handle potential errors during deletion
-                    console.error("Error leaving game:", response.status);
-                    alert("Failed to leave the game. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error leave game:", error);
-                alert("An unexpected error occurred while leaving the game.");
+                window.location.href = "/lobby";
+            } else {
+                // Handle potential errors during deletion
+                console.error("Error leaving game:", response.status);
+                alert("Failed to leave the game. Please try again.");
             }
-        } else {
-            // Player cancelled, reset the input field if it exists
-            if (leaveConfirmInput) {
-                leaveConfirmInput.value = "";
-            }
-            console.log("Game cancelled.");
+        } catch (error) {
+            console.error("Error leave game:", error);
+            alert("An unexpected error occurred while leaving the game.");
         }
-    });
+    } else {
+        // Player cancelled, reset the input field if it exists
+        if (leaveConfirmInput) {
+            leaveConfirmInput.value = "";
+        }
+        console.log("Game cancelled.");
+    }
+});
 
 
 

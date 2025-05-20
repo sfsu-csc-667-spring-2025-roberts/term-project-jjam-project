@@ -1,0 +1,13 @@
+.card-image {
+    width: 80px; /* Adjust as needed */
+    height: 110px; /* Adjust as needed, maintaining aspect ratio */
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.card-image-container {
+    display: inline-block; /* Or use flexbox on playerHandDiv */
+    margin: 5px;
+    cursor: pointer;
+    /* Add other styling for the card container if desired */
+}

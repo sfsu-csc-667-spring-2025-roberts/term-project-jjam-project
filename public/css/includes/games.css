@@ -50,10 +50,10 @@
 }
 
 /* I know, heart and diamond should be red, and spade and club should be black, but this is a reference to a tv show. Bonus points if you can figure out which one! */
-.s { color: blue; }/* Spade */
-.h { color: black; }/* Heart */
-.d { color: red; }/* Diamond */
-.c { color: green; }/* Club */
+.s { color: red; }/* Spade */
+.h { color: green; }/* Heart */
+.d { color: black; }/* Diamond */
+.c { color: blue; }/* Club */
 .w { color: blueviolet; font-weight: bold;}/* Club */
 
 #chat-container {
