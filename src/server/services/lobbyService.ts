@@ -1,5 +1,5 @@
 // src/server/services/lobbyService.ts
-import { getLobbies, getLobby, saveLobby, deleteLobby } from '../db/games';
+import { getLobbies, getLobby, saveLobby, deleteLobby } from '../db/games/lobby';
 import crypto from 'crypto';
 
 export interface Lobby {
@@ -28,7 +28,7 @@ export function listLobbies(): ServiceResult<Lobby[]> {
   }
 }
 
-export function createLobby(user: { id: string; email: string; gravatar?: string }, name?: string): ServiceResult<Lobby> {
+export function createLobby(user: { id: string; email: string; gravatar?: string } | undefined, name?: string): ServiceResult<Lobby> {
   try {
     if (!user || !user.id) {
       return { success: false, error: { code: 'UNAUTHENTICATED', message: 'User not authenticated.' } };
@@ -51,7 +51,7 @@ export function createLobby(user: { id: string; email: string; gravatar?: string
   }
 }
 
-export function joinLobby(user: { id: string; email: string; gravatar?: string }, lobbyId: string): ServiceResult<Lobby> {
+export function joinLobby(user: { id: string; email: string; gravatar?: string } | undefined, lobbyId: string): ServiceResult<Lobby> {
   try {
     if (!user || !user.id) {
       return { success: false, error: { code: 'UNAUTHENTICATED', message: 'User not authenticated.' } };
@@ -71,7 +71,7 @@ export function joinLobby(user: { id: string; email: string; gravatar?: string }
   }
 }
 
-export function leaveLobby(user: { id: string; email: string; gravatar?: string }, lobbyId: string): ServiceResult<Lobby> {
+export function leaveLobby(user: { id: string; email: string; gravatar?: string } | undefined, lobbyId: string): ServiceResult<Lobby> {
   try {
     if (!user || !user.id) {
       return { success: false, error: { code: 'UNAUTHENTICATED', message: 'User not authenticated.' } };
@@ -80,7 +80,7 @@ export function leaveLobby(user: { id: string; email: string; gravatar?: string 
     if (!lobby) {
       return { success: false, error: { code: 'NOT_FOUND', message: 'Lobby not found.' } };
     }
-    lobby.players = lobby.players.filter(pid => pid !== user.id);
+    lobby.players = lobby.players.filter((pid: string) => pid !== user.id);
     saveLobby(lobby);
     return { success: true, data: lobby };
   } catch (e) {

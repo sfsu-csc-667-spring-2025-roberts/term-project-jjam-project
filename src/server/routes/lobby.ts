@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import * as lobbyService from "../services/lobbyService";
-// @ts-ignore - Ignore TypeScript errors for this import
-import { getLobby, saveLobby } from "../db/games";
+import { getLobby, saveLobby } from "../db/games/lobby";
 
 const router = express.Router();
 
@@ -19,7 +18,6 @@ router.get("/list", (req: Request, res: Response) => {
 // Create a lobby (POST /lobby/create)
 router.post("/create", (req: Request, res: Response) => {
   const user = (req.session && (req.session as any).user) as { id: string; email: string; gravatar?: string } | undefined;
-  // @ts-ignore - The function handles undefined users internally
   const result = lobbyService.createLobby(user, req.body.name);
   if (result.success) {
     res.json({ success: true, lobby: result.data });
@@ -32,7 +30,6 @@ router.post("/create", (req: Request, res: Response) => {
 // Join a lobby (POST /lobby/join)
 router.post("/join", (req: Request, res: Response) => {
   const user = (req.session && (req.session as any).user) as { id: string; email: string; gravatar?: string } | undefined;
-  // @ts-ignore - The function handles undefined users internally
   const result = lobbyService.joinLobby(user, req.body.lobbyId);
   if (result.success) {
     res.json({ success: true, lobby: result.data, playerCount: result.data?.players.length });
@@ -45,7 +42,6 @@ router.post("/join", (req: Request, res: Response) => {
 // Leave a lobby (POST /lobby/leave)
 router.post("/leave", (req: Request, res: Response) => {
   const user = (req.session && (req.session as any).user) as { id: string; email: string; gravatar?: string } | undefined;
-  // @ts-ignore - The function handles undefined users internally
   const result = lobbyService.leaveLobby(user, req.body.lobbyId);
   if (result.success) {
     res.json({ success: true });
