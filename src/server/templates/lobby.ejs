@@ -35,13 +35,38 @@
             </form>
           </div>
         </div>
-        <input
-          type="text"
-          id="lobby-search-input"
-          placeholder="Search lobbies..."
-          style="margin: 10px 0; display: block"
-        />
+        <div>
+          <h1>Join a Lobby! </h1>
+          <input
+            type="text"
+            id="lobby-search-input"
+            placeholder="Search lobbies..."
+            style="margin: 10px 0; display: block"
+          />
 
+          <div class="game-list">
+            <button class="game-button">
+              <img src="https://gravatar.com/avatar/<%= user.gravatar %>?s=30&d=identicon" alt="Game Icon" class="game-icon" />
+              <span>Game 1</span>
+            </button>
+
+            <button class="game-button">
+              <img src="https://gravatar.com/avatar/<%= user.gravatar %>?s=30&d=identicon" alt="Game Icon" class="game-icon" />
+              <span>Game 2</span>
+            </button>
+
+            <button class="game-button">
+              <img src="https://gravatar.com/avatar/<%= user.gravatar %>?s=30&d=identicon" alt="Game Icon" class="game-icon" />
+              <span>Game 3</span>
+            </button>
+
+            <button class="game-button">
+              <img src="https://gravatar.com/avatar/<%= user.gravatar %>?s=30&d=identicon" alt="Game Icon" class="game-icon" />
+              <span>Game 4</span>
+            </button>
+          </div>
+        </div>
+      
         <section id="game-listing" class="lobby-cards"></section>
 
         <button id="add-ai-btn" class="secondary-btn" style="margin-bottom: 16px;">Add AI Opponent</button>

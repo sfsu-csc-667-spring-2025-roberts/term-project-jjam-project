@@ -317,3 +317,34 @@ section#game-listing {
     margin-bottom: 15px;
     font-weight: 500;
 }
+
+.game-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.game-button {
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    align-items: center;
+    background-color: #ccc;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.game-button:hover {
+    background-color: #bbb;
+}
+
+.game-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
