@@ -1,0 +1,126 @@
+/* Card Styling */
+
+/* Card Container */
+.card {
+  width: 100px;
+  height: 140px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  position: relative;
+  display: inline-block;
+  margin: 5px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  transform-style: preserve-3d;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Card Front */
+.card-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Card Back */
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
+  border-radius: 8px;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+}
+
+/* Card Suit and Rank */
+.card-rank {
+  font-size: 1.4em;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.card-suit {
+  font-size: 2.5em;
+  align-self: center;
+  margin: 10px 0;
+  line-height: 1;
+}
+
+/* Suit Colors */
+.card-suit.hearts,
+.card-suit.diamonds {
+  color: #e74c3c; /* Red */
+}
+
+.card-suit.spades,
+.card-suit.clubs {
+  color: #2c3e50; /* Black */
+}
+
+/* Card Container for Player's Hand */
+.player-hand {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 20px;
+  min-height: 180px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+/* Play Area */
+.play-area {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  margin: 30px 0;
+}
+
+.discard-pile,
+.draw-pile {
+  width: 100px;
+  height: 140px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9em;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .card {
+    width: 80px;
+    height: 112px;
+  }
+  
+  .card-rank {
+    font-size: 1.2em;
+  }
+  
+  .card-suit {
+    font-size: 2em;
+  }
+  
+  .play-area {
+    flex-direction: column;
+    gap: 20px;
+  }
+}

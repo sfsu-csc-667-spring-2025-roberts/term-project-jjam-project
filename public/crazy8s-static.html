@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/includes/variables.css">
   <link rel="stylesheet" href="/css/includes/create-game-form.css">
+  <link rel="stylesheet" href="/css/includes/cards.css">
   <!-- Accessibility & Semantic Improvements by Cascade AI -->
   <style>
     body {
@@ -147,6 +148,40 @@
 <body>
   <!-- Main application landmark -->
   <div class="crazy8s-layout" role="main">
+    <!-- Game Board -->
+    <div class="game-board">
+      <h1 class="game-title">Crazy 8s</h1>
+      
+      <!-- Opponents Area -->
+      <div class="opponents-area">
+        <!-- Will be populated by JavaScript -->
+      </div>
+      
+      <!-- Play Area -->
+      <div class="play-area">
+        <div class="draw-pile" id="drawPile">
+          <div class="card-back"></div>
+        </div>
+        <div class="discard-pile" id="discardPile">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <!-- Player's Hand -->
+      <div class="player-hand-container">
+        <h3>Your Hand</h3>
+        <div class="player-hand" id="playerHand">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+      
+      <!-- Game Controls -->
+      <div class="game-controls">
+        <button id="drawCard" class="btn">Draw Card</button>
+        <button id="playCard" class="btn" disabled>Play Selected</button>
+      </div>
+    </div>
+    
     <!-- Players Sidebar (dynamic placeholder) -->
     <aside class="players-sidebar" aria-label="Players List">
       <h2>Players</h2>
@@ -515,5 +550,37 @@
       }
     }
   </style>
+  
+  <!-- Game Scripts -->
+  <script type="module">
+    import { CardManager } from '/js/modules/cardManager.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize card manager
+      const cardManager = new CardManager();
+      
+      // Example: Create a test hand
+      const testHand = ['2H', '8D', 'KC', '10S', 'AH'];
+      const playerHand = document.getElementById('playerHand');
+      
+      // Render the test hand
+      cardManager.renderHand(testHand, playerHand);
+      
+      // Example: Set up draw pile click handler
+      document.getElementById('drawCard').addEventListener('click', () => {
+        console.log('Draw card clicked');
+        // TODO: Implement draw card logic
+      });
+      
+      // Example: Set up play card button
+      document.getElementById('playCard').addEventListener('click', () => {
+        const selectedCard = document.querySelector('.card.selected');
+        if (selectedCard) {
+          console.log('Play card:', selectedCard.dataset.card);
+          // TODO: Implement play card logic
+        }
+      });
+    });
+  </script>
 </body>
 </html>
