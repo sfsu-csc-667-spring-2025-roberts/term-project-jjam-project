@@ -708,3 +708,4 @@ setInterval(async () => {
 //Initial fetch of opponent card counts and discard pile
 fetchAndUpdateOpponentCardCounts();
 fetchAndUpdateDiscard();
+

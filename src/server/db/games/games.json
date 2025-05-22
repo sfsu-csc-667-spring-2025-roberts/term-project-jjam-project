@@ -1,0 +1,38 @@
+{
+  "lobbies": [
+    {
+      "id": "d4cf4b30-d445-403c-b58f-79515e42db4a",
+      "name": "anzara",
+      "host": 3,
+      "players": [
+        3
+      ],
+      "created": 1746769454715,
+      "started": false,
+      "chat": []
+    },
+    {
+      "id": "33413ad5-a165-4e8a-95e7-9a4a07cebdb8",
+      "name": "Lobby 3341",
+      "host": 3,
+      "players": [
+        3
+      ],
+      "created": 1746772621070,
+      "started": false,
+      "chat": []
+    },
+    {
+      "id": "58ec6d58-f44f-40c8-90c2-6b99879c389d",
+      "name": "Lobby 58ec",
+      "host": 3,
+      "players": [
+        3
+      ],
+      "created": 1746772628314,
+      "started": false,
+      "chat": []
+    }
+  ],
+  "games": []
+}

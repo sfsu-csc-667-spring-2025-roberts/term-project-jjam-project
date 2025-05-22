@@ -1,0 +1,26 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crazy Eights | Game</title>
+    <%- include('shared/head') %>
+</head>
+<body>
+    <div id="container">
+        <%- include('shared/menu') %>
+        <h1>Crazy Eights Game Room</h1>
+        <div id="game-content">
+            <div id="game-state"></div>
+            <div id="player-hand"></div>
+            <button id="draw-btn">Draw Card</button>
+        </div>
+        <section id="chat-container">
+            <div id="messages"></div>
+            <form>
+                <input type="text" name="message" id="message"/>
+                <button type="submit" id="send-button">Send</button>
+            </form>
+        </section>
+    </div>
+    <script src="/js/game.js"></script>
+</body>
+</html>
