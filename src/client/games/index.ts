@@ -425,18 +425,59 @@ async function displaySuitSelectionPopup(): Promise<string | null> {
 
 
 
-startGameButton?.addEventListener("click", event => {
+startGameButton?.addEventListener("click", async event => {
     event.preventDefault();
     const gameId = getGameId();
-    console.log(`games/${gameId}/start`);
-    fetch(`${gameId}/start`, {
-        method: "post",
-    });
+    console.log(`Attempting to start game: games/${gameId}/start`);
 
-    //set all in game users to players
-    fetch(`${gameId}/setInGamePlayers`, {
-        method: "post",
-    });
+    let startResponseStatus;
+    try {
+        // Await the response from the game start API
+        const startResponse = await fetch(`${gameId}/start`, {
+            method: "post",
+        });
+        startResponseStatus = startResponse.status;
+
+        // Check for specific error codes for game start
+        if (startResponseStatus === 413) {
+            alert("Not enough players to play!"); // Alert for insufficient players
+            console.warn(`Game start failed (413 - Not Enough Players) for gameId: ${gameId}.`);
+            return; // Stop execution
+        } else if (startResponseStatus === 414) {
+            alert("Too many players to play!"); // Alert for too many players
+            console.warn(`Game start failed (414 - Too Many Players) for gameId: ${gameId}.`);
+            return; // Stop execution
+        } else if (!startResponse.ok) {
+            // Handle any other non-2xx status codes (e.g., 400, 500, 403 if it still happens and you want to catch it generically)
+            console.error(`Failed to start game. Status: ${startResponseStatus}`);
+            alert(`Failed to start game. Error: ${startResponseStatus}`); // Generic error alert
+            return; // Stop execution for other errors
+        }
+        console.log(`Game start successful, status: ${startResponseStatus}`);
+
+    } catch (error) {
+        console.error("Network error or exception during game start fetch:", error);
+        alert("Could not connect to the server to start the game. Please try again."); // Alert for network issues
+        return; // Stop execution on network errors
+    }
+
+    // Set all in-game users to players
+    try {
+        const setPlayersResponse = await fetch(`${gameId}/setInGamePlayers`, {
+            method: "post",
+        });
+
+        // The original logic for setInGamePlayers' 403 is kept as it was not specified to change
+        if (setPlayersResponse.status !== 403) {
+            console.log("setInGamePlayers successful, status:", setPlayersResponse.status);
+        } else {
+            console.warn("setInGamePlayers returned 403 (Forbidden).");
+            // Handle the 403 case for setInGamePlayers, e.g., show a message
+        }
+    } catch (error) {
+        console.error("Error setting in-game players:", error);
+        // Handle network errors or other issues with the fetch call
+    }
 
     // Send a chat message that the game has started
     fetch(`/chat/${gameId}`, {
@@ -446,7 +487,7 @@ startGameButton?.addEventListener("click", event => {
         },
         body: JSON.stringify({
             message: "The game has started! Host plays first!",
-            senderId: 0, //ID 0 is the system
+            senderId: 0, // ID 0 is the system
         }),
     }).catch((error) => {
         console.error("Error sending game started message:", error);
@@ -456,7 +497,7 @@ startGameButton?.addEventListener("click", event => {
     if (startGameButton) {
         startGameButton.style.display = 'none';
     }
-})
+});
 
 drawCardButton?.addEventListener("click", event => {
     event.preventDefault();

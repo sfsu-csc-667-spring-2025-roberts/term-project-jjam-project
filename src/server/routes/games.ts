@@ -76,13 +76,13 @@ router.post("/:gameId/start", async (request: Request, response: Response) => {
 
     if (gameInfo.min_players > gameInfo.player_count) {
         console.log("Not enough players to play!");
-        response.status(200).send();
+        response.status(413).send();
         return;
     }
 
     if (gameInfo.max_players < gameInfo.player_count) {
         console.log("Too many players to play!");
-        response.status(200).send();
+        response.status(414).send();
         return;
     }
     await Game.start(gameId);
