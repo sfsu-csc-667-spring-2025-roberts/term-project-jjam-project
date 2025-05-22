@@ -20,21 +20,48 @@
       <div id="content">
         <div id="feedback-message"></div>
 
-        <button id="create-game-button" class="primary-btn">Create Lobby</button>
-        
-        <div id="create-game-container" class="modal">
-          <div class="modal-content">
-            <span id="close-create-game-form" class="close">&times;</span>
-            <h2>Create New Lobby</h2>
-            <form id="create-game-form">
-              <div class="form-group">
-                <label for="game-name">Lobby Name:</label>
-                <input type="text" id="game-name" name="name" required>
-              </div>
-              <button type="submit" class="primary-btn">Create</button>
-            </form>
-          </div>
-        </div>
+    <!-- Create Lobby Button -->
+<button id="create-game-button" class="primary-btn">Create Lobby</button>
+
+<!-- Create Game Modal (initially hidden) -->
+<div id="create-game-container" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span id="close-create-game-form" class="close">&times;</span>
+    <h2>Create New Game</h2>
+    <form id="create-game-form">
+      <div class="form-group">
+        <label for="game-description">Description</label>
+        <input type="text" id="game-description" name="description" placeholder="Optional game description" />
+      </div>
+      <div class="form-group">
+        <label for="min-players">Min Players</label>
+        <input type="number" id="min-players" name="minPlayers" value="2" min="2" max="4" />
+      </div>
+      <div class="form-group">
+        <label for="max-players">Max Players</label>
+        <input type="number" id="max-players" name="maxPlayers" value="4" min="2" max="4" />
+      </div>
+      <div class="form-group">
+        <label for="game-password">Password (optional)</label>
+        <input type="password" id="game-password" name="password" placeholder="Leave blank for public game" />
+      </div>
+      <button type="submit" class="primary-btn">Create Game</button>
+    </form>
+  </div>
+</div>
+<!-- Join Lobby Form -->
+<form action="/games/join/" method="post" style="margin: 20px 0;" id="join-game-form">
+  <div class="form-group">
+    <label for="roomId">Join Room ID</label>
+    <input type="text" id="roomId" name="roomId" placeholder="Enter Room ID" required />
+  </div>
+  <div class="form-group">
+    <label for="password">Password (if any)</label>
+    <input type="password" id="password" name="password" placeholder="Enter password (if needed)" />
+  </div>
+  <button type="submit" class="primary-btn">Join Game</button>
+</form>
+
         <input
           type="text"
           id="lobby-search-input"
@@ -88,6 +115,39 @@
             margin-top: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
           }
+          .modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal.visible {
+  display: block;
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.close {
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
           .chat-messages {
             max-height: 350px;
             overflow-y: auto;
@@ -146,6 +206,19 @@
             font-size: 15px;
             background: #fff;
           }
+        
+  #join-game-form .form-group {
+    margin-bottom: 12px;
+  }
+  #join-game-form input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+
+
         </style>
       </div>
 
@@ -171,5 +244,6 @@
 
       <%- include("shared/templates") %>
     </div>
+    <script src="/js/lobby/index.js"></script>
   </body>
 </html>

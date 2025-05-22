@@ -3,72 +3,49 @@
 import { ChatMessage } from "../../../types/global";
 import { socket } from "../sockets";
 
+// Get the room ID from the input field
 const roomId = document.querySelector<HTMLInputElement>("#room-id")?.value;
 
-
+// Select the chat container div inside the #chat-container
 const chatContainer = document.querySelector<HTMLDivElement>(
     "#chat-container div"
 );
 
-socket.on("chat:message:0", ({message, sender, timestamp}: ChatMessage) => {
-    //do something with this
-    //console.log("chat message", {message, sender, timestamp});
-
-    //allows us to use a premade template instead of building the html within this page every time a message is made
+// Listen for incoming chat messages from the server
+socket.on(`chat:message:${roomId}`, ({ message, sender, timestamp }: ChatMessage) => {
+    // Create a chat message using a template
     const container = document.querySelector<HTMLTemplateElement>("#chat-message-template")?.content.cloneNode(true) as HTMLDivElement;
-    
-    const img = container.querySelector<HTMLImageElement>("img")!;
 
+    const img = container.querySelector<HTMLImageElement>("img")!;
     img.src = `https://gravatar.com/avatar/${sender.gravatar}?d=identicon`;
     img.alt = `Gravatar for ${sender.email}`;
 
     container.querySelector<HTMLSpanElement>(".message-content")!.innerText = message;
     container.querySelector<HTMLSpanElement>(".message-timestamp")!.innerText = new Date(timestamp).toLocaleTimeString();
 
-    // const container = document.createElement("div");
-    // container.classList.add("message");
-
-    //const img = document.createElement("img");
-    // img.src = `https://gravatar.com/avatar/${sender.gravatar}?d=identicon`;
-    // img.alt = `Gravatar for ${sender.email}`;
-    // img.classList.add("avatar");
-    // container.appendChild(img);
-
-    // const messageContainer = document.createElement("div");
-    // messageContainer.classList.add("message-wrapper");
-
-    // const messageContent = document.createElement("span");
-    // messageContent.classList.add("message-content");
-    // messageContent.innerText = message;
-
-    // const messageTimestamp = document.createElement("span");
-    // messageTimestamp.classList.add("message-timestamp");
-    // messageTimestamp.innerText = new Date(timestamp).toLocaleTimeString();
-
-    // messageContainer.appendChild(messageContent);
-    // messageContainer.appendChild(messageTimestamp);
-
-    // container.appendChild(messageContainer);
-
+    // Add the message to the chat container
     chatContainer?.appendChild(container);
 });
 
+// Get the form and input field from the DOM
 const chatForm = document.querySelector<HTMLFormElement>(
     "#chat-container form"
 );
-
-const chatInput = document.querySelector<HTMLFormElement>(
+const chatInput = document.querySelector<HTMLInputElement>(
     "#chat-container input"
 );
 
+// Handle sending chat messages
 chatForm?.addEventListener("submit", (event) => {
     event.preventDefault();
     const message = chatInput?.value;
-    if (!message){
+    if (!message) {
         return;
-    } 
+    }
+
     chatInput.value = "";
 
+    // Send the message to the server
     fetch(`/chat/${roomId}`, {
         method: "post",
         headers: {
@@ -77,10 +54,11 @@ chatForm?.addEventListener("submit", (event) => {
         body: JSON.stringify({
             message,
         }),
-    }).catch((error)=>{
+    }).catch((error) => {
         console.error("Error sending message:", error);
-    })
+    });
 });
-// socket.on("test-event", (data: any) => { 
+
+// socket.on("test-event", (data: any) => {
 //     console.log("Received test-event:", data);
-// })
+// });

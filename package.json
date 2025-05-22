@@ -20,13 +20,16 @@
     "url": "git+https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-jjam-project.git"
   },
   "targets": {
-    "chat": {
-      "source": "./src/client/chat/index.ts"
-    },
-    "games": {
-      "source": "./src/client/games/index.ts"
-    }
+  "chat": {
+    "source": "./src/client/chat/index.ts"
   },
+  "games": {
+    "source": "./src/client/games/index.ts"
+  },
+  "lobby": {
+    "source": "./src/client/lobby/index.ts"
+  }
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -35,7 +38,7 @@
   },
   "homepage": "https://github.com/sfsu-csc-667-spring-2025-roberts/term-project-jjam-project#readme",
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unkown"
+    "**/*": "prettier --write --ignore-unknown"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -61,7 +64,7 @@
     "socket.io-client": "^4.8.1",
     "supertest": "^7.1.0",
     "ts-node": "^10.9.2",
-    "typecript": "^0.0.1-security"
+   "typescript": "^5.3.3"
   },
   "dependencies": {
     "@types/socket.io-client": "^1.4.36",

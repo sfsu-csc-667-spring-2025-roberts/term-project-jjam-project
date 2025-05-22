@@ -1,5 +1,11 @@
-/* Modern color variables */
-:root {
+/* good for debugging */
+/* {
+  border: 1px solid red;
+} */
+
+  
+  /* Modern color variables from main */
+  :root {
     --primary: #4361ee;
     --primary-hover: #3a56d4;
     --secondary: #3f37c9;
@@ -9,7 +15,13 @@
     --light-text: #f8f9fa;
     --gray-text: #6c757d;
     --border-color: #dee2e6;
-}
+  }
+@import url("https://www.nerdfonts.com/assets/css/webfont.css");
+@import url("/css/includes/variables.css");
+@import url("/css/includes/chat.css");
+@import url("/css/includes/menu.css");
+@import url("/css/includes/create-game-form.css");
+
 
 body {
     font-family: 'Poppins', sans-serif;
@@ -107,6 +119,7 @@ section#chat-container {
 section#game-listing {
     flex-grow: 2;
 }
+
 
 #chat-container div#messages {
     overflow-y: auto; 

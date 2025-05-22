@@ -160,11 +160,11 @@
       });
     }
   }
-})({"ZbenO":[function(require,module,exports,__globalThis) {
+})({"8ooLz":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
-var HMR_PORT = 58425;
-var HMR_SERVER_PORT = 58425;
+var HMR_PORT = 61986;
+var HMR_SERVER_PORT = 61986;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
 var HMR_USE_SSE = false;
@@ -667,82 +667,34 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"9YDZd":[function(require,module,exports,__globalThis) {
-// Modern real-time chat client for lobby using Socket.IO
-const socket = window.io ? window.io() : null;
-
-function renderChat(messages) {
-    const messagesDiv = document.getElementById('messages');
-    if (!messagesDiv) return;
-    messagesDiv.innerHTML = '';
-    messages.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = 'chat-message' + (msg.userId === window.userId ? ' self' : '');
-        div.innerHTML = `
-            <img class="avatar" src="https://gravatar.com/avatar/${msg.gravatar || ''}?s=36&d=identicon" alt="avatar" />
-            <div class="msg-content">
-                <span class="username">${msg.username || msg.user || 'User'}</span>
-                <span class="timestamp">${msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : ''}</span><br/>
-                ${msg.message}
-            </div>
-        `;
-        messagesDiv.appendChild(div);
-    });
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-
-// Listen for chat events
-if (socket && window.lobbyId) {
-    socket.on('chatMessage', data => {
-        if (data.lobbyId === window.lobbyId) {
-            renderChat(data.chat);
-        }
-    });
-    // Optionally listen for lobbyState for initial chat
-    socket.on('lobbyState', data => {
-        if (data.lobbyId === window.lobbyId) {
-            renderChat(data.lobby.chat || []);
-        }
-    });
-}
-
+//console.log("Hello from the client (chat)");
+var _sockets = require("../sockets");
+// Get the room ID from the input field
+const roomId = document.querySelector("#room-id")?.value;
+// Select the chat container div inside the #chat-container
 const chatContainer = document.querySelector("#chat-container div");
-(0, _sockets.socket).on("chat:message:0", ({ message, sender, timestamp })=>{
-    //do something with this
-    //console.log("chat message", {message, sender, timestamp});
-    //allows us to use a premade template instead of building the html within this page every time a message is made
+// Listen for incoming chat messages from the server
+(0, _sockets.socket).on(`chat:message:${roomId}`, ({ message, sender, timestamp })=>{
+    // Create a chat message using a template
     const container = document.querySelector("#chat-message-template")?.content.cloneNode(true);
     const img = container.querySelector("img");
     img.src = `https://gravatar.com/avatar/${sender.gravatar}?d=identicon`;
     img.alt = `Gravatar for ${sender.email}`;
     container.querySelector(".message-content").innerText = message;
     container.querySelector(".message-timestamp").innerText = new Date(timestamp).toLocaleTimeString();
-    // const container = document.createElement("div");
-    // container.classList.add("message");
-    //const img = document.createElement("img");
-    // img.src = `https://gravatar.com/avatar/${sender.gravatar}?d=identicon`;
-    // img.alt = `Gravatar for ${sender.email}`;
-    // img.classList.add("avatar");
-    // container.appendChild(img);
-    // const messageContainer = document.createElement("div");
-    // messageContainer.classList.add("message-wrapper");
-    // const messageContent = document.createElement("span");
-    // messageContent.classList.add("message-content");
-    // messageContent.innerText = message;
-    // const messageTimestamp = document.createElement("span");
-    // messageTimestamp.classList.add("message-timestamp");
-    // messageTimestamp.innerText = new Date(timestamp).toLocaleTimeString();
-    // messageContainer.appendChild(messageContent);
-    // messageContainer.appendChild(messageTimestamp);
-    // container.appendChild(messageContainer);
+    // Add the message to the chat container
     chatContainer?.appendChild(container);
 });
+// Get the form and input field from the DOM
 const chatForm = document.querySelector("#chat-container form");
 const chatInput = document.querySelector("#chat-container input");
+// Handle sending chat messages
 chatForm?.addEventListener("submit", (event)=>{
     event.preventDefault();
     const message = chatInput?.value;
     if (!message) return;
     chatInput.value = "";
+    // Send the message to the server
     fetch(`/chat/${roomId}`, {
         method: "post",
         headers: {
@@ -754,17 +706,63 @@ chatForm?.addEventListener("submit", (event)=>{
     }).catch((error)=>{
         console.error("Error sending message:", error);
     });
-}); // socket.on("test-event", (data: any) => { 
+}); // socket.on("test-event", (data: any) => {
  //     console.log("Received test-event:", data);
- // })
+ // });
 
 },{"../sockets":"2YbY8"}],"2YbY8":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+// Send a chat message to a lobby
+parcelHelpers.export(exports, "sendChatMessage", ()=>sendChatMessage);
+// Listen for incoming chat messages
+parcelHelpers.export(exports, "onChatMessage", ()=>onChatMessage);
+// --- Player Join/Leave/CardPlayed Helpers ---
+parcelHelpers.export(exports, "joinLobby", ()=>joinLobby);
+parcelHelpers.export(exports, "leaveLobby", ()=>leaveLobby);
+parcelHelpers.export(exports, "playCard", ()=>playCard);
+parcelHelpers.export(exports, "onPlayerJoined", ()=>onPlayerJoined);
+parcelHelpers.export(exports, "onPlayerLeft", ()=>onPlayerLeft);
+parcelHelpers.export(exports, "onCardPlayed", ()=>onCardPlayed);
 parcelHelpers.export(exports, "socket", ()=>socket);
 var _socketIoClient = require("socket.io-client");
 var _socketIoClientDefault = parcelHelpers.interopDefault(_socketIoClient);
 const socket = (0, _socketIoClientDefault.default)();
+function sendChatMessage(lobbyId, message) {
+    socket.emit("chatMessage", {
+        lobbyId,
+        message
+    });
+}
+function onChatMessage(callback) {
+    socket.on("chatMessage", callback);
+}
+function joinLobby(lobbyId) {
+    socket.emit("playerJoin", {
+        lobbyId
+    });
+}
+function leaveLobby(lobbyId) {
+    socket.emit("playerLeave", {
+        lobbyId
+    });
+}
+function playCard(lobbyId, card, nextPlayerId) {
+    socket.emit("cardPlayed", {
+        lobbyId,
+        card,
+        nextPlayerId
+    });
+}
+function onPlayerJoined(callback) {
+    socket.on("playerJoined", callback);
+}
+function onPlayerLeft(callback) {
+    socket.on("playerLeft", callback);
+}
+function onCardPlayed(callback) {
+    socket.on("cardPlayed", callback);
+}
 
 },{"socket.io-client":"8HBJR","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8HBJR":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
@@ -4402,6 +4400,6 @@ function Backoff(opts) {
     this.jitter = jitter;
 };
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["ZbenO","9YDZd"], "9YDZd", "parcelRequirea38c", {})
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["8ooLz","9YDZd"], "9YDZd", "parcelRequirea38c", {})
 
 //# sourceMappingURL=index.js.map
