@@ -122,6 +122,7 @@ router.post("/:gameId/:cardId/:isEightVal/discard", async (request: Request, res
     console.log(`Comparing users ${userId} to ${turnIdInt}`);
 
     if (userId != await turnIdInt) {
+        alert("Not your turn!");
         console.log("Not your turn!");
         response.status(403).send("Not your turn!");
     } else {
@@ -308,6 +309,7 @@ router.post("/:gameId/draw", async (request: Request, response: Response) => {
     console.log(`Comparing ${userId} to ${turnIdInt}`);
 
     if (userId != turnIdInt) {
+        alert("Not your turn!");
         console.log("Not your turn!");
         response.status(403).send("Not your turn!");
         return;

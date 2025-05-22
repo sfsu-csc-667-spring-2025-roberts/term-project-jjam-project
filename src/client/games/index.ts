@@ -283,9 +283,11 @@ async function fetchAndUpdatePlayerHand() {
                                         console.error("Error fetching current player name:", error);
                                     }
                                 }, 450);
-                            } else if (discardResponse.status === 403) {
+                            } else if (discardResponse.status == 403) {
                                 const message = await discardResponse.text();
                                 console.log(`Discard failed: ${message}`);
+                            } else if (discardResponse.status == 500) {
+                                alert("Not your turn!");
                             } else {
                                 console.error("Error discarding card:", discardResponse.status);
                             }
@@ -329,9 +331,11 @@ async function fetchAndUpdatePlayerHand() {
                                         console.error("Error fetching current player name:", error);
                                     }
                                 }, 450);
-                            } else if (discardResponse.status === 403) {
+                            } else if (discardResponse.status == 403) {
                                 const message = await discardResponse.text();
                                 console.log(`Discard failed: ${message}`);
+                            } else if (discardResponse.status == 500) {
+                                alert("Not your turn!");
                             } else {
                                 console.error("Error discarding card:", discardResponse.status);
                             }
@@ -441,7 +445,7 @@ startGameButton?.addEventListener("click", event => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            message: "The game has started!",
+            message: "The game has started! Host plays first!",
             senderId: 0, //ID 0 is the system
         }),
     }).catch((error) => {
@@ -470,6 +474,8 @@ drawCardButton?.addEventListener("click", event => {
                 response.text().then(message => {
                     console.log(`Draw failed: ${message}`);
                 });
+            } else if (response.status == 500) {
+                alert("Not your turn!");
             } else {
                 console.error("Failed to draw card:", response.status);
             }
