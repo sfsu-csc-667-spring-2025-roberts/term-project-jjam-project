@@ -447,11 +447,6 @@ startGameButton?.addEventListener("click", async event => {
             alert("Too many players to play!"); // Alert for too many players
             console.warn(`Game start failed (414 - Too Many Players) for gameId: ${gameId}.`);
             return; // Stop execution
-        } else if (!startResponse.ok) {
-            // Handle any other non-2xx status codes (e.g., 400, 500, 403 if it still happens and you want to catch it generically)
-            console.error(`Failed to start game. Status: ${startResponseStatus}`);
-            alert(`Failed to start game. Error: ${startResponseStatus}`); // Generic error alert
-            return; // Stop execution for other errors
         }
         console.log(`Game start successful, status: ${startResponseStatus}`);
 

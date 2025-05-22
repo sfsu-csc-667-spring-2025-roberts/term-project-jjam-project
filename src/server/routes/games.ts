@@ -403,7 +403,7 @@ router.post("/:gameId/draw", async (request: Request, response: Response) => {
                         console.log("No playable card found in the current hand, drawing again.");
                         const deckCheck = await Game.isDeckEmpty(gameId);
                         console.log(`DECK CHECK: ${deckCheck}`);
-                        if (deckCheck) {
+                        if (deckCheck == true) {
                             console.log("Deck Empty! Shuffling discard pile!");
                             Game.shuffleDiscard(gameId);
                         }

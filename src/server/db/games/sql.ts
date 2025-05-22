@@ -147,6 +147,7 @@ SELECT
             FROM game_cards
             WHERE user_id = 0
             AND game_id=$(gameId)
+            LIMIT 1
         )
         THEN 'false'
         ELSE 'true' --return true if the deck is empty
