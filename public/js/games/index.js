@@ -160,11 +160,11 @@
       });
     }
   }
-})({"9KHD9":[function(require,module,exports,__globalThis) {
+})({"lRVAk":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
-var HMR_PORT = 57373;
-var HMR_SERVER_PORT = 57373;
+var HMR_PORT = 61986;
+var HMR_SERVER_PORT = 61986;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
 var HMR_USE_SSE = false;
@@ -1223,6 +1223,6 @@ setInterval(async ()=>{
 fetchAndUpdateOpponentCardCounts();
 fetchAndUpdateDiscard();
 
-},{}]},["9KHD9","8WnK3"], "8WnK3", "parcelRequirea38c", {})
+},{}]},["lRVAk","8WnK3"], "8WnK3", "parcelRequirea38c", {})
 
 //# sourceMappingURL=index.js.map

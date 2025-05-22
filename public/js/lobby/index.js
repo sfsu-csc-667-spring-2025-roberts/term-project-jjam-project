@@ -160,11 +160,11 @@
       });
     }
   }
-})({"eXWoV":[function(require,module,exports,__globalThis) {
+})({"h957p":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
-var HMR_PORT = 57373;
-var HMR_SERVER_PORT = 57373;
+var HMR_PORT = 61986;
+var HMR_SERVER_PORT = 61986;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
 var HMR_USE_SSE = false;
@@ -742,6 +742,6 @@ createGameForm?.addEventListener("submit", (event)=>{
     }).catch((err)=>console.error("Error creating game:", err));
 });
 
-},{}]},["eXWoV","b3RtJ"], "b3RtJ", "parcelRequirea38c", {})
+},{}]},["h957p","b3RtJ"], "b3RtJ", "parcelRequirea38c", {})
 
 //# sourceMappingURL=index.js.map
