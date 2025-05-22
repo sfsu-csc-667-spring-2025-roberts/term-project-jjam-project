@@ -160,11 +160,11 @@
       });
     }
   }
-})({"h957p":[function(require,module,exports,__globalThis) {
+})({"emdSp":[function(require,module,exports,__globalThis) {
 var global = arguments[3];
 var HMR_HOST = null;
-var HMR_PORT = 61986;
-var HMR_SERVER_PORT = 61986;
+var HMR_PORT = 63089;
+var HMR_SERVER_PORT = 63089;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
 var HMR_USE_SSE = false;
@@ -674,16 +674,25 @@ const joinForm = document.querySelector('form[action^="/games/join/"]');
 // Open modal
 createGameButton?.addEventListener("click", (event)=>{
     event.preventDefault();
-    createGameContainer?.classList.add("visible");
+    if (createGameContainer) {
+        createGameContainer.style.display = "block";
+        createGameContainer.classList.add("visible");
+    }
 });
 // Close modal via close button
 closeButton?.addEventListener("click", (event)=>{
     event.preventDefault();
-    createGameContainer?.classList.remove("visible");
+    if (createGameContainer) {
+        createGameContainer.style.display = "none";
+        createGameContainer.classList.remove("visible");
+    }
 });
 // Close modal by clicking outside the form
 createGameContainer?.addEventListener("click", (event)=>{
-    if (event.target === createGameContainer) createGameContainer.classList.remove("visible");
+    if (event.target === createGameContainer) {
+        createGameContainer.style.display = "none";
+        createGameContainer.classList.remove("visible");
+    }
 });
 // Join existing game
 joinForm?.addEventListener("submit", async (event)=>{
@@ -725,23 +734,20 @@ createGameForm?.addEventListener("submit", (event)=>{
     const minPlayers = parseInt(minInput?.value || "2");
     const maxPlayers = parseInt(maxInput?.value || "4");
     const password = passwordInput?.value || "";
-    fetch("/api/games/create", {
+    fetch("/lobby/create", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            description,
-            minPlayers,
-            maxPlayers,
-            password
+            name: description
         })
     }).then((res)=>res.json()).then((data)=>{
-        if (data && data.lobbyId) window.location.href = `/lobby/${data.lobbyId}`;
-        else console.error("Game creation failed:", data);
+        if (data.success && data.lobby) window.location.href = `/lobby/${data.lobby.id}`;
+        else console.error("Lobby creation failed:", data);
     }).catch((err)=>console.error("Error creating game:", err));
 });
 
-},{}]},["h957p","b3RtJ"], "b3RtJ", "parcelRequirea38c", {})
+},{}]},["emdSp","b3RtJ"], "b3RtJ", "parcelRequirea38c", {})
 
 //# sourceMappingURL=index.js.map

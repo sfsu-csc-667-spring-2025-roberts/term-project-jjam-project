@@ -1,23 +1,30 @@
 const createGameButton = document.querySelector("#create-game-button");
-const createGameContainer = document.querySelector("#create-game-container");
+const createGameContainer = document.querySelector<HTMLDivElement>("#create-game-container");
 const closeButton = document.querySelector("#close-create-game-form");
 const joinForm = document.querySelector<HTMLFormElement>('form[action^="/games/join/"]');
 
 // Open modal
 createGameButton?.addEventListener("click", (event) => {
   event.preventDefault();
-  createGameContainer?.classList.add("visible");
+  if (createGameContainer) {
+    createGameContainer.style.display = "block";
+    createGameContainer.classList.add("visible");
+  }
 });
 
 // Close modal via close button
 closeButton?.addEventListener("click", (event) => {
   event.preventDefault();
-  createGameContainer?.classList.remove("visible");
+  if (createGameContainer) {
+    createGameContainer.style.display = "none";
+    createGameContainer.classList.remove("visible");
+  }
 });
 
 // Close modal by clicking outside the form
 createGameContainer?.addEventListener("click", (event) => {
   if (event.target === createGameContainer) {
+    createGameContainer.style.display = "none";
     createGameContainer.classList.remove("visible");
   }
 });
@@ -70,19 +77,19 @@ createGameForm?.addEventListener("submit", (event) => {
   const maxPlayers = parseInt(maxInput?.value || "4");
   const password = passwordInput?.value || "";
 
-  fetch("/api/games/create", {
+  fetch("/lobby/create", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ description, minPlayers, maxPlayers, password }),
+    body: JSON.stringify({ name: description }),
   })
     .then((res) => res.json())
     .then((data) => {
-      if (data && data.lobbyId) {
-        window.location.href = `/lobby/${data.lobbyId}`;
+      if (data.success && data.lobby) {
+        window.location.href = `/lobby/${data.lobby.id}`;
       } else {
-        console.error("Game creation failed:", data);
+        console.error("Lobby creation failed:", data);
       }
     })
     .catch((err) => console.error("Error creating game:", err));
