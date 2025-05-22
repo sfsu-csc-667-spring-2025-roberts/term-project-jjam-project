@@ -32,7 +32,8 @@ router.post("/join/:gameId", async (request: Request, response: Response) => {
         response.redirect(`/games/${gameId}`);
     } catch (error) {
         console.log({ error });
-        response.redirect("/lobby");
+        console.log("*****************************************************************");
+        response.status(403);
     }
 });
 

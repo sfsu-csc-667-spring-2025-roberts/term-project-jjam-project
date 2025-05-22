@@ -14,8 +14,12 @@ const create = async (name: string, minPlayers: string, maxPlayers: string, pass
     return gameId;
 }
 
-const join = async (userId: number, gameId: number, password: string = "") => {
+const join = async (userId: number, gameId: number, password: string) => {
     const { playerCount } = await db.one(CONDITIONALLY_JOIN_SQL, { gameId, userId, password });
+    console.log(`password: ${password}`);
+    if (playerCount == null){
+        console.log("**************************************************************************");
+    }
     return playerCount;
 }
 
